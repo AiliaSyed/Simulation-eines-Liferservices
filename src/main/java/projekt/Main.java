@@ -1,7 +1,7 @@
 package projekt;
 
 /**
- * Seht ihr dieses Kommentar, seid ihr im richtigen Github von Ailia Syed :D Test
+ * Das ist der dritte TEst, wir haben eine Main Methode yippie :)
  */
 
 public class Main {
