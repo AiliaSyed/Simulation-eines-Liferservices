@@ -1,7 +1,7 @@
 package projekt;
 
 /**
- * Das ist der dritte TEst, wir haben eine Main Methode yippie :)
+ * Das Projekt ist auf dem Stand des Commits vom 17.01
  */
 
 public class Main {
