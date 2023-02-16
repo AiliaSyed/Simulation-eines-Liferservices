@@ -56,19 +56,52 @@ class RegionImpl implements Region {
     }
 
     /**
+     * @User Kristina Shigabutdinova
      * Adds the given {@link NodeImpl} to this {@link RegionImpl}.
      * @param node the {@link NodeImpl} to add.
      */
     void putNode(NodeImpl node) {
-        crash(); // TODO: H2.2 - remove if implemented
+
+        //if node not in Region then IllegalArgumentException
+        if(!node.getRegion().equals(this)){
+            throw new IllegalArgumentException("Node "+node.toString()+" has incorrect region");
+        }
+        //else put node to Map nodes
+        else{
+            nodes.put(node.getLocation(), node);
+        }
     }
 
     /**
+     * @User Kristina Shigabutdinova
      * Adds the given {@link EdgeImpl} to this {@link RegionImpl}.
      * @param edge the {@link EdgeImpl} to add.
      */
     void putEdge(EdgeImpl edge) {
-        crash(); // TODO: H2.4 - remove if implemented
+        //if edge or one of its nodes NOT in Region then IllegalArgumentException
+        if(!edge.getRegion().equals(this) || !edge.getNodeA().getRegion().equals(this) || !edge.getNodeB().getRegion().equals(this)){
+            throw new IllegalArgumentException("Edge "+ edge +" has incorrect region");
+        }
+        //if node A or node B is null then IllegalArgumentException
+        //(maybe in one if instead of two *see H2.4)
+        else if(edge.getNodeA() == null){
+            throw new IllegalArgumentException("Node {A,B} "+edge.getLocationA()+ " is not part of the region");
+        }
+        else if(edge.getNodeB() == null){
+            throw new IllegalArgumentException("Node {A,B} "+edge.getLocationB()+ " is not part of the region");
+        }
+
+        //create the Map of edges
+        Map<Location, EdgeImpl> nodeAEdges = this.edges.get(edge.getNodeA().getLocation());
+        Map<Location, EdgeImpl> nodeBEdges = this.edges.get(edge.getNodeB().getLocation());
+
+        //adding to Map of edges and to allEdges
+        nodeAEdges.put(edge.getNodeB().getLocation(), edge);
+        nodeBEdges.put(edge.getNodeA().getLocation(), edge);
+        allEdges.add(edge);
+
+        //Sort allEdges based on the natural order of EdgeImpl
+        allEdges.sort(Comparator.naturalOrder());
     }
 
     @Override
