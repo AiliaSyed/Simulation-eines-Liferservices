@@ -14,8 +14,12 @@ public final class Location implements Comparable<Location> {
     private final static Comparator<Location> COMPARATOR =
         Comparator.comparing(Location::getX).thenComparing(Location::getY);
 
+
     private final int x;
     private final int y;
+
+
+
 
     /**
      * Instantiates a new {@link Location} object using {@code x} and {@code y} as coordinates.
@@ -70,21 +74,51 @@ public final class Location implements Comparable<Location> {
 
     @Override
     public int compareTo(@NotNull Location o) {
-        return crash(); // TODO: H1.1 - remove if implemented
+        if( this.x == o.getX() && this.y == o.getY()){
+            return 0;
+        }
+        else if (o.getX() > x || (x == o.getX() && o.getY() > y)){
+            return -1;
+        }else
+            return 1;
+
+
+
+        // TODO: H1.1 - remove if implemented
     }
 
     @Override
     public int hashCode() {
-        return crash(); // TODO: H1.2 - remove if implemented
+
+        int hash = 31 * x + y;
+        return hash + 100000;
+
+
+        // TODO: H1.2 - remove if implemented
     }
 
     @Override
     public boolean equals(Object o) {
-        return crash(); // TODO: H1.3 - remove if implemented
+
+
+        if (o == null || !(o instanceof Location)){
+            return false;
+        }
+        if (o == this){
+            return true;
+        }
+
+        Location l2 = (Location) o;
+
+        return this.x == l2.x && this.y == l2.y;
+
+        // TODO: H1.3 - remove if implemented
     }
 
     @Override
     public String toString() {
-        return crash(); // TODO: H1.4 - remove if implemented
+        return  "("+ x + ","+ y + ")";
+
+        // TODO: H1.4 - remove if implemented
     }
 }
