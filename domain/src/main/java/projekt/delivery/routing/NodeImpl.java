@@ -54,7 +54,10 @@ class NodeImpl implements Region.Node {
 
     @Override
     public @Nullable Region.Edge getEdge(Region.Node other) {
-        return crash(); // TODO: H3.1 - remove if implemented
+        if(region.getNode(location).getEdge(other) != null){
+            return region.getNode(location).getEdge(other);
+        }
+        return null;
     }
 
     @Override

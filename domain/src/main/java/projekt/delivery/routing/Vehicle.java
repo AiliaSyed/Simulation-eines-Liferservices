@@ -92,11 +92,16 @@ public interface Vehicle extends Comparable<Vehicle> {
     void reset();
 
     /**
+     * @User Ailia Syed
      * Returns the total weight of all {@link ConfirmedOrder}s loaded onto this {@link Vehicle}.
      * @return The total weight of all {@link ConfirmedOrder}s loaded onto this {@link Vehicle}.
      */
     default double getCurrentWeight() {
-        return crash(); // TODO: H5.1 - remove if implemented
+        double currentWeight = 0;
+        for (ConfirmedOrder order : getOrders()) {
+            currentWeight += order.getWeight();
+        }
+        return currentWeight;
     }
 
     /**
