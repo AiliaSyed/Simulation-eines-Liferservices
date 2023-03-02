@@ -109,6 +109,7 @@ class RegionImpl implements Region {
      */
     void putEdge(EdgeImpl edge) {
         //if edge or one of its nodes NOT in Region then IllegalArgumentException
+
         if(!edge.getRegion().equals(this) || !edge.getNodeA().getRegion().equals(this) || !edge.getNodeB().getRegion().equals(this)){
             throw new IllegalArgumentException("Edge "+ edge +" has incorrect region");
         }
