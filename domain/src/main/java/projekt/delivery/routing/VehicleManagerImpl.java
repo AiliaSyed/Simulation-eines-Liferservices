@@ -30,16 +30,53 @@ class VehicleManagerImpl implements VehicleManager {
         occupiedEdges = toOccupiedEdges(region.getEdges());
     }
 
+    /**
+     * @User Ailia Syed
+     * @param nodes
+     * @return
+     */
     private Map<Region.Node, OccupiedNodeImpl<? extends Region.Node>> toOccupiedNodes(Collection<Region.Node> nodes) {
-        return crash(); // TODO: H6.1 - remove if implemented
+        Map<Region.Node, OccupiedNodeImpl<?>> occupiedNodes = new HashMap<>();
+        for (Region.Node node : nodes) {
+            if (node instanceof Region.Restaurant) {
+                Region.Restaurant restaurant = (Region.Restaurant) node;
+                OccupiedRestaurantImpl occupiedRestaurant = new OccupiedRestaurantImpl(restaurant, this);
+                occupiedNodes.put(restaurant, occupiedRestaurant);
+            } else if (node instanceof Region.Neighborhood) {
+                Region.Neighborhood neighborhood = (Region.Neighborhood) node;
+                OccupiedNeighborhoodImpl occupiedNeighborhood = new OccupiedNeighborhoodImpl(neighborhood, this);
+                occupiedNodes.put(neighborhood, occupiedNeighborhood);
+            } else {
+                OccupiedNodeImpl<Region.Node> occupiedNode = new OccupiedNodeImpl<>(node, this);
+                occupiedNodes.put(node, occupiedNode);
+            }
+        }
+        return Collections.unmodifiableMap(occupiedNodes);
     }
 
+    /**
+     * @User Ailia Syed
+     * @param edges
+     * @return
+     */
     private Map<Region.Edge, OccupiedEdgeImpl> toOccupiedEdges(Collection<Region.Edge> edges) {
-        return crash(); // TODO: H6.1 - remove if implemented
+        Map<Region.Edge, OccupiedEdgeImpl> occupiedEdges = new HashMap<>();
+        for (Region.Edge edge : edges) {
+            OccupiedEdgeImpl occupiedEdge = new OccupiedEdgeImpl(edge, this);
+            occupiedEdges.put(edge, occupiedEdge);
+        }
+        return Collections.unmodifiableMap(occupiedEdges);
     }
 
+    /**
+     * @User Ailia Syed
+     * @return unmodified set with all attributes of occupiedNodes und occupiedEdges
+     */
     private Set<AbstractOccupied<?>> getAllOccupied() {
-        return crash(); // TODO: H6.2 - remove if implemented
+        Set<VehicleManager.Occupied<?>> allOccupied = new HashSet<>();
+        allOccupied.addAll(occupiedNodes.values());
+        allOccupied.addAll(occupiedEdges.values());
+        return null;
     }
 
     private OccupiedNodeImpl<? extends Region.Node> getOccupiedNode(Location location) {
