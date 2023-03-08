@@ -35,12 +35,22 @@ public class InTimeRater implements Rater {
 
     @Override
     public double getScore() {
-        return crash(); // TODO: H8.2 - remove if implemented
+        /*if (maxTicksOff == 0) {
+            return 0;
+        } else {
+            double score = 1 - (double) actualTotalTicksOff / maxTicksOff;
+            return Math.max(0, score);
+        }
+
+         */
+        return crash();
+        // TODO: H8.2 - remove if implemented
     }
 
     @Override
     public void onTick(List<Event> events, long tick) {
-        crash(); // TODO: H8.2 - remove if implemented
+        crash();
+        // TODO: H8.2 - remove if implemented
     }
 
     /**

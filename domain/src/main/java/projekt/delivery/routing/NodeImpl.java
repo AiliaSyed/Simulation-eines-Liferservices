@@ -3,6 +3,7 @@ package projekt.delivery.routing;
 import org.jetbrains.annotations.Nullable;
 import projekt.base.Location;
 
+import java.util.Objects;
 import java.util.Set;
 
 import static org.tudalgo.algoutils.student.Student.crash;
@@ -54,39 +55,81 @@ class NodeImpl implements Region.Node {
 
     @Override
     public @Nullable Region.Edge getEdge(Region.Node other) {
-        if(region.getNode(location).getEdge(other) != null){
+
+
+        if (region.getNode(location).getEdge(other) != null){
             return region.getNode(location).getEdge(other);
         }
         return null;
+
+        // TODO: H3.1 - remove if implemented
+
     }
 
     @Override
     public Set<Region.Node> getAdjacentNodes() {
-        return crash(); // TODO: H3.2 - remove if implemented
+        Set<Region.Node> adjacentNodes = null;
+        for(Region.Node node : region.getNodes()){
+            if (region.getNode(location).getEdge(node) != null) {
+                adjacentNodes.add(node);
+            }
+        }
+        if (adjacentNodes.isEmpty()) {
+            adjacentNodes.add(this);
+        }
+        return adjacentNodes;
+
+        // TODO: H3.2 - remove if implemented
     }
 
     @Override
     public Set<Region.Edge> getAdjacentEdges() {
-        return crash(); // TODO: H3.3 - remove if implemented
+
+        Set<Region.Edge> adjacentEdges = null;
+        adjacentEdges.addAll(region.getEdges());
+        for (Region.Edge edge : region.getEdges()) {
+            if(region.getNode(location).getEdge((Region.Node) edge) != null){
+                adjacentEdges.add(edge);
+            }
+        }
+        return adjacentEdges;
+
+        // TODO: H3.3 - remove if implemented
     }
 
     @Override
     public int compareTo(Region.Node o) {
-         return crash(); // TODO: H3.4 - remove if implemented
+        return location.compareTo(o.getLocation());
+         // TODO: H3.4 - remove if implemented
     }
 
     @Override
     public boolean equals(Object o) {
-        return crash(); // TODO: H3.5 - remove if implemented
+        NodeImpl other = (NodeImpl) o;
+        if (o == null || !(o instanceof NodeImpl)){
+            return false;
+        }
+
+        if ( o == this ||
+            (Objects.equals(this.name, other. name) && Objects.equals( this.location, other.location) && Objects.equals(this.connections, other.connections))){
+            return true;
+        }
+        else
+            return false;
+
+        // TODO: H3.5 - remove if implemented
     }
 
     @Override
     public int hashCode() {
-        return crash(); // TODO: H3.6 - remove if implemented
+        return Objects.hash(name, location, connections);
+
+        // TODO: H3.6 - remove if implemented
     }
 
     @Override
     public String toString() {
-        return crash(); // TODO: H3.7 - remove if implemented
+        return "NodeImpl(name=" +getName()+ ", location=" +getLocation()+ ", connections= " +getConnections()+ ")";
+        // TODO: H3.7 - remove if implemented
     }
 }
