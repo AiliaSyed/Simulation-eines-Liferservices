@@ -51,12 +51,30 @@ class VehicleImpl implements Vehicle {
 
     @Override
     public void moveDirect(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
-        crash(); // TODO: H5.4 - remove if implemented
+        moveQueue.clear();
+
+        if(node == this.getStartingNode().getComponent()){
+            throw new IllegalArgumentException();
+        }
+        Region.Node nextNode = (Region.Node) getPaths().get(0);
+        for (int i = 0; i < getPaths().size() + 1; i++) {
+            moveQueue.add((PathImpl) getPaths().get(i));
+        }
     }
 
+    /**
+     * @User Ailia Syed
+     * moves the queue to the next destination for the vehicle
+     * @param node
+     * @param arrivalAction
+     */
     @Override
     public void moveQueued(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
-        crash(); // TODO: H5.3 - remove if implemented
+        // Check if the given node is valid
+        if (moveQueue.isEmpty() && node == this.getStartingNode().getComponent()) {
+            throw new IllegalArgumentException();
+        }
+        moveQueue.add(new PathImpl(vehicleManager.getPathCalculator().getPath((Region.Node) startingNode,node), arrivalAction));
     }
 
     @Override

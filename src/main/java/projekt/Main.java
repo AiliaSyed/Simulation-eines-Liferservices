@@ -1,9 +1,5 @@
 package projekt;
 
-/**
- * Das Projekt ist auf dem Stand des Commits vom 09.02
- */
-
 public class Main {
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
