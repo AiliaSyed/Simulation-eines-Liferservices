@@ -1,7 +1,7 @@
 package projekt;
 
 /**
- * Das Projekt ist auf dem Stand des Commits vom 17.01
+ * Das Projekt ist auf dem Stand des Commits vom 09.02
  */
 
 public class Main {

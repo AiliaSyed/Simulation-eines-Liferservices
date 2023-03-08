@@ -25,7 +25,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.function.*;
+import java.util.stream.Collector;
 
 import static projekt.gui.TUColors.*;
 
@@ -49,7 +50,7 @@ public class MapPane extends Pane {
     private static final double MIN_SCALE = 3;
 
     private final AtomicReference<Point2D> lastPoint = new AtomicReference<>();
-    private final AffineTransform transformation = new AffineTransform();
+    private AffineTransform transformation = new AffineTransform();
 
     private final Text positionText = new Text();
 
@@ -70,6 +71,8 @@ public class MapPane extends Pane {
     private Consumer<? super Collection<Vehicle>> vehiclesSelectionHandler;
     private Consumer<? super Collection<Vehicle>> vehiclesRemoveSelectionHandler;
 
+    private boolean alreadyCentered = false;
+
     /**
      * Creates a new, empty {@link MapPane}.
      */
@@ -78,7 +81,7 @@ public class MapPane extends Pane {
     }
 
     /**
-     * Creates a new {@link MapPane} nad displays the given components.
+     * Creates a new {@link MapPane}, displays the given components and centers itself.
      *
      * @param nodes    The {@link Region.Node}s to display.
      * @param edges    The {@link Region.Edge}s to display.
@@ -88,9 +91,8 @@ public class MapPane extends Pane {
                    Collection<? extends Region.Edge> edges,
                    Collection<? extends Vehicle> vehicles) {
 
-        //TODO make configurable
-        transformation.translate(350, 350);
-        transformation.scale(20, 20);
+        //avoid division by zero when scale = 1
+        transformation.scale(MIN_SCALE, MIN_SCALE);
 
         for (Region.Edge edge : edges) {
             addEdge(edge);
@@ -118,6 +120,12 @@ public class MapPane extends Pane {
      * @param edge The {@link Region.Edge} to display.
      */
     public void addEdge(Region.Edge edge) {
+        if (selectedNode != null) {
+            if (edge.getNodeA().getLocation().equals(selectedNode.getLocation()) || edge.getNodeB().getLocation().equals(selectedNode.getLocation())) {
+                handleNodeClick(nodes.get(selectedNode).ellipse(), selectedNode);
+            }
+        }
+
         edges.put(edge, drawEdge(edge));
     }
 
@@ -154,6 +162,20 @@ public class MapPane extends Pane {
         return selectedEdge;
     }
 
+    /**
+     * Selects the given {@link Region.Edge} and executes the action set by {@link #onEdgeSelection(Consumer)}.
+     * <p>This is equivalent to clicking manually on the {@link Region.Edge}.</p>
+     *
+     * @throws IllegalArgumentException if the given {@link Region.Edge} is not part of this {@link MapPane}
+     * @param edge the edge to select
+     */
+    public void selectEdge(Region.Edge edge) {
+        if (!edges.containsKey(edge)) {
+            throw new IllegalArgumentException("The given edge is not part of this MapPane");
+        }
+
+        handleEdgeClick(edges.get(edge).line(), edge);
+    }
     /**
      * Sets the action that is supposed to be executed when the user selects an {@link Region.Edge}.
      *
@@ -258,6 +280,21 @@ public class MapPane extends Pane {
      */
     public Region.Node getSelectedNode() {
         return selectedNode;
+    }
+
+    /**
+     * Selects the given {@link Region.Node} and executes the action set by {@link #onNodeSelection(Consumer)}.
+     * <p>This is equivalent to clicking manually on the {@link Region.Node}.</p>
+     *
+     * @throws IllegalArgumentException if the given {@link Region.Node} is not part of this {@link MapPane}
+     * @param node the node to select
+     */
+    public void selectNode(Region.Node node) {
+        if (!nodes.containsKey(node)) {
+            throw new IllegalArgumentException("The given node is not part of this MapPane");
+        }
+
+        handleNodeClick(nodes.get(node).ellipse(), node);
     }
 
     /**
@@ -430,6 +467,10 @@ public class MapPane extends Pane {
         for (Vehicle vehicle : new HashSet<>(vehicles.keySet())) {
             removeVehicle(vehicle);
         }
+
+        selectedNode = null;
+        selectedEdge = null;
+        selectedVehicles = null;
     }
 
     /**
@@ -439,6 +480,58 @@ public class MapPane extends Pane {
         redrawNodes();
         redrawEdges();
         redrawVehicles();
+    }
+
+    /**
+     * Tries to center this {@link MapPane} as good as possible such that each node is visible while keeping the zoom factor as high as possible.
+     */
+    public void center() {
+
+        if (getHeight() == 0.0 || getWidth() == 0.0) {
+            return;
+        }
+
+        if (nodes.isEmpty()) {
+            transformation.scale(20, 20);
+            redrawGrid();
+            return;
+        }
+
+        double maxX = nodes.keySet().stream().map(node -> node.getLocation().getX())
+            .collect(new ComparingCollector<Integer>(Comparator.naturalOrder()));
+
+        double maxY = nodes.keySet().stream().map(node -> node.getLocation().getY())
+            .collect(new ComparingCollector<Integer>(Comparator.naturalOrder()));
+
+        double minX = nodes.keySet().stream().map(node -> node.getLocation().getX())
+            .collect(new ComparingCollector<Integer>(Comparator.reverseOrder()));
+
+        double minY = nodes.keySet().stream().map(node -> node.getLocation().getY())
+            .collect(new ComparingCollector<Integer>(Comparator.reverseOrder()));
+
+        if (minX == maxX) {
+            minX = minX - 1;
+            maxX = maxX + 1;
+        }
+
+        if (minY == maxY) {
+            minY = minY - 1;
+            maxY = maxY + 1;
+        }
+
+        AffineTransform reverse = new AffineTransform();
+
+        reverse.setToTranslation(minX, minY);
+        reverse.scale(1.25 * (maxX - minX) / getWidth(),1.25 * (maxY - minY) / getHeight());
+        reverse.translate(-Math.abs(0.125 * reverse.getTranslateX()) / reverse.getScaleX(),-Math.abs(0.125 * reverse.getTranslateY()) / reverse.getScaleY());
+
+        transformation = reverse;
+        transformation = getReverseTransform();
+
+        redrawGrid();
+        redrawMap();
+
+        alreadyCentered = true;
     }
 
     // --- Private Methods --- //
@@ -482,15 +575,27 @@ public class MapPane extends Pane {
 
         widthProperty().addListener((obs, oldValue, newValue) -> {
             setClip(new Rectangle(0, 0, getWidth(), getHeight()));
-            redrawGrid();
-            redrawMap();
+
+            if (alreadyCentered) {
+                redrawGrid();
+                redrawMap();
+            } else {
+                center();
+            }
+
             drawPositionText();
         });
 
         heightProperty().addListener((obs, oldValue, newValue) -> {
             setClip(new Rectangle(0, 0, getWidth(), getHeight()));
-            redrawGrid();
-            redrawMap();
+
+            if (alreadyCentered) {
+                redrawGrid();
+                redrawMap();
+            } else {
+                center();
+            }
+
             drawPositionText();
         });
     }
@@ -600,7 +705,7 @@ public class MapPane extends Pane {
                 nodeSelectionHandler.accept(selectedNode);
             }
 
-            if (vehiclesSelectionHandler != null && selectedVehicles != null) {
+            if (vehiclesSelectionHandler != null && selectedVehicles.size() != 0) {
                 vehiclesSelectionHandler.accept(selectedVehicles);
             }
         }
@@ -748,5 +853,49 @@ public class MapPane extends Pane {
     }
 
     private record LabeledNode(Ellipse ellipse, Text text) {
+    }
+
+    private record ComparingCollector<T extends Comparable<T>>(Comparator<T> comparator) implements Collector<T, List<T>, T> {
+
+        @Override
+        public Supplier<List<T>> supplier() {
+            return ArrayList::new;
+        }
+
+        @Override
+        public BiConsumer<List<T>, T> accumulator() {
+            return List::add;
+        }
+
+        @Override
+        public BinaryOperator<List<T>> combiner() {
+            return (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            };
+        }
+
+        @Override
+        public Function<List<T>, T> finisher() {
+            return list -> {
+
+                T bestFit = null;
+
+                for (T elem : list) {
+                    if (bestFit == null) {
+                        bestFit = elem;
+                    } else if (comparator.compare(elem, bestFit) > 0) {
+                        bestFit = elem;
+                    }
+                }
+
+                return bestFit;
+            };
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return Collections.emptySet();
+        }
     }
 }
