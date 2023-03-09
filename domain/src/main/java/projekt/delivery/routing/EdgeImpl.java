@@ -91,7 +91,7 @@ class EdgeImpl implements Region.Edge {
     /**
      * @User Kristina Shigabutdinova
      *
-     * returns the node of the location B of region
+     * returns the node of the location B of  region
      * @return node of location B
      */
     public Region.Node getNodeB() {
