@@ -35,12 +35,22 @@ public class InTimeRater implements Rater {
 
     @Override
     public double getScore() {
-        return crash(); // TODO: H8.2 - remove if implemented
+        /*if (maxTicksOff == 0) {
+            return 0;
+        } else {
+            double score = 1 - (double) actualTotalTicksOff / maxTicksOff;
+            return Math.max(0, score);
+        }
+
+         */
+        return crash();
+        // TODO: H8.2 - remove if implemented
     }
 
     @Override
     public void onTick(List<Event> events, long tick) {
-        crash(); // TODO: H8.2 - remove if implemented
+        crash();
+        // TODO: H8.2 - remove if implemented
     }
 
     /**
@@ -62,7 +72,7 @@ public class InTimeRater implements Rater {
         }
 
         @Override
-        public Rater create() {
+        public InTimeRater create() {
             return new InTimeRater(ignoredTicksOff, maxTicksOff);
         }
 
@@ -70,8 +80,8 @@ public class InTimeRater implements Rater {
          * Creates a new {@link InTimeRater.FactoryBuilder}.
          * @return The created {@link InTimeRater.FactoryBuilder}.
          */
-        public static InTimeRater.FactoryBuilder builder() {
-            return new InTimeRater.FactoryBuilder();
+        public static FactoryBuilder builder() {
+            return new FactoryBuilder();
         }
     }
 
@@ -96,7 +106,7 @@ public class InTimeRater implements Rater {
         }
 
         @Override
-        public Rater.Factory build() {
+        public Factory build() {
             return new Factory(ignoredTicksOff, maxTicksOff);
         }
     }

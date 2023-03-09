@@ -3,7 +3,7 @@ package projekt.delivery.routing;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import static org.tudalgo.algoutils.student.Student.crash;
 
@@ -50,13 +50,31 @@ class VehicleImpl implements Vehicle {
     }
 
     @Override
-    public void moveDirect(Region.Node node, Consumer<? super Vehicle> arrivalAction) {
-        crash(); // TODO: H5.4 - remove if implemented
+    public void moveDirect(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
+        moveQueue.clear();
+
+        if(node == this.getStartingNode().getComponent()){
+            throw new IllegalArgumentException();
+        }
+        Region.Node nextNode = (Region.Node) getPaths().get(0);
+        for (int i = 0; i < getPaths().size() + 1; i++) {
+            moveQueue.add((PathImpl) getPaths().get(i));
+        }
     }
 
+    /**
+     * @User Ailia Syed
+     * moves the queue to the next destination for the vehicle
+     * @param node
+     * @param arrivalAction
+     */
     @Override
-    public void moveQueued(Region.Node node, Consumer<? super Vehicle> arrivalAction) {
-        crash(); // TODO: H5.3 - remove if implemented
+    public void moveQueued(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
+        // Check if the given node is valid
+        if (moveQueue.isEmpty() && node == this.getStartingNode().getComponent()) {
+            throw new IllegalArgumentException();
+        }
+        moveQueue.add(new PathImpl(vehicleManager.getPathCalculator().getPath((Region.Node) startingNode,node), arrivalAction));
     }
 
     @Override
@@ -105,11 +123,11 @@ class VehicleImpl implements Vehicle {
         final PathImpl path = moveQueue.peek();
         if (path.nodes().isEmpty()) {
             moveQueue.pop();
-            final @Nullable Consumer<? super Vehicle> action = path.arrivalAction();
+            final @Nullable BiConsumer<? super Vehicle, Long> action = path.arrivalAction();
             if (action == null) {
                 move(currentTick);
             } else {
-                action.accept(this);
+                action.accept(this, currentTick);
             }
         } else {
             Region.Node next = path.nodes().peek();
@@ -124,12 +142,28 @@ class VehicleImpl implements Vehicle {
         }
     }
 
-    void loadOrder(ConfirmedOrder order) {
-        crash(); // TODO: H5.2 - remove if implemented
+    /**
+     * checks if the weight of the new order exceeds the max weight of vehicle
+     * @User Ailia Syed
+     * @param order
+     * @throws VehicleOverloadedException
+     */
+    void loadOrder(ConfirmedOrder order) throws VehicleOverloadedException {
+        double currentLoad = orders.stream().mapToDouble(ConfirmedOrder::getWeight).sum();
+        double newLoad = currentLoad + order.getWeight();
+        if (newLoad > capacity) {
+            throw new VehicleOverloadedException(this,newLoad);
+        }
+        orders.add(order);
     }
 
+    /**
+     * removes the given order from the main order
+     * @User Ailia Syed
+     * @param order
+     */
     void unloadOrder(ConfirmedOrder order) {
-        crash(); // TODO: H5.2 - remove if implemented
+        orders.remove(order);
     }
 
     @Override
@@ -147,7 +181,7 @@ class VehicleImpl implements Vehicle {
             + ')';
     }
 
-    private record PathImpl(Deque<Region.Node> nodes, Consumer<? super Vehicle> arrivalAction) implements Path {
+    private record PathImpl(Deque<Region.Node> nodes, BiConsumer<? super Vehicle, Long> arrivalAction) implements Path {
 
     }
 }
