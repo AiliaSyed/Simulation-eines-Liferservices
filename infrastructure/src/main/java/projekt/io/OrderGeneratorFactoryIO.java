@@ -43,7 +43,7 @@ public class OrderGeneratorFactoryIO {
                         fridayBuilder.setOrderCount(Integer.parseInt(serializedOrderGenerator[1]));
                         fridayBuilder.setDeliveryInterval(Integer.parseInt(serializedOrderGenerator[2]));
                         fridayBuilder.setMaxWeight(Double.parseDouble(serializedOrderGenerator[3]));
-                        fridayBuilder.setVariance(Double.parseDouble(serializedOrderGenerator[4]));
+                        fridayBuilder.setStandardDeviation(Double.parseDouble(serializedOrderGenerator[4]));
                         fridayBuilder.setLastTick(Integer.parseInt(serializedOrderGenerator[5]));
                         if (Integer.parseInt(serializedOrderGenerator[6]) >= 0) {
                             fridayBuilder.setSeed(Integer.parseInt(serializedOrderGenerator[6]));
@@ -70,14 +70,16 @@ public class OrderGeneratorFactoryIO {
             writer.write("O %s".formatted(factory.getClass().getName()));
 
             if (factory instanceof FridayOrderGenerator.Factory fridayFactory) {
-                writer.write(" %d %d %f %f %d %d\n".formatted(
+                writer.write(" %d %d %s %s %d %d\n".formatted(
                     fridayFactory.orderCount,
                     fridayFactory.deliveryInterval,
-                    fridayFactory.maxWeight,
-                    fridayFactory.variance,
+                    Double.toString(fridayFactory.maxWeight),
+                    Double.toString(fridayFactory.standardDeviation),
                     fridayFactory.lastTick,
                     fridayFactory.seed)
                 );
+            } else {
+                writer.write("\n");
             }
 
             writer.write("END ORDER GENERATOR\n");

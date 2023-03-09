@@ -32,7 +32,16 @@ public class TravelDistanceRater implements Rater {
 
     @Override
     public double getScore() {
-        return crash(); // TODO: H8.3 - remove if implemented
+        /*if (actualDistance > 0.0 && actualDistance < worstDistance * factor) {
+            return 1.0 - actualDistance / (worstDistance * factor);
+        }
+        else {
+            return 0.0;
+        }
+
+         */
+        return crash();
+        // TODO: H8.3 - remove if implemented
     }
 
     @Override
@@ -42,7 +51,8 @@ public class TravelDistanceRater implements Rater {
 
     @Override
     public void onTick(List<Event> events, long tick) {
-        crash(); // TODO: H8.3 - remove if implemented
+        crash();
+        // TODO: H8.3 - remove if implemented
     }
 
     /**
@@ -59,7 +69,7 @@ public class TravelDistanceRater implements Rater {
         }
 
         @Override
-        public Rater create() {
+        public TravelDistanceRater create() {
             return new TravelDistanceRater(vehicleManager, factor);
         }
 
@@ -67,8 +77,8 @@ public class TravelDistanceRater implements Rater {
          * Creates a new {@link TravelDistanceRater.FactoryBuilder}.
          * @return The created {@link TravelDistanceRater.FactoryBuilder}.
          */
-        public static TravelDistanceRater.FactoryBuilder builder() {
-            return new TravelDistanceRater.FactoryBuilder();
+        public static FactoryBuilder builder() {
+            return new FactoryBuilder();
         }
 
 
@@ -85,7 +95,7 @@ public class TravelDistanceRater implements Rater {
         private FactoryBuilder() {}
 
         @Override
-        public Rater.Factory build() {
+        public Factory build() {
             return new Factory(vehicleManager, factor);
         }
 
