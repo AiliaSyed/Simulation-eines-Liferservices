@@ -1,11 +1,11 @@
 package projekt.delivery.generator;
 
+import projekt.base.Location;
+import projekt.base.TickInterval;
 import projekt.delivery.routing.ConfirmedOrder;
 import projekt.delivery.routing.VehicleManager;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 import static org.tudalgo.algoutils.student.Student.crash;
 
@@ -32,12 +32,29 @@ public class FridayOrderGenerator implements OrderGenerator {
      */
     private FridayOrderGenerator(int orderCount, VehicleManager vehicleManager, int deliveryInterval, double maxWeight, double variance, long lastTick, int seed) {
         random = seed < 0 ? new Random() : new Random(seed);
-        crash(); // TODO: H7.1 - remove if implemented
+        orderCount = (int) random.nextGaussian(0,lastTick);
+
+       // (int)random.nextGaussian(0,variance) ;
+        // double weight = random.nextGaussian(0,maxWeight);
+
+            // TODO: H7.1 - remove if implemented
     }
 
     @Override
     public List<ConfirmedOrder> generateOrders(long tick) {
-        return crash(); // TODO: H7.1 - remove if implemented
+        if (tick < 0) {
+            throw new IndexOutOfBoundsException();
+        } else {
+            Location location = vehicleManager.getOccupiedNeighborhoods();
+            VehicleManager.OccupiedRestaurant restaurant = vehicleManager.getOccupiedRestaurants();
+            TickInterval interval = new TickInterval(tick, tick + deliveryInterval);
+            List<String> foodlist = new ArrayList<>();
+            foodlist.set(random.nextInt(0, 10), restaurant.getComponent().getAvailableFood().toString());
+            //String invalidFood = foodList.stream().filter(food -> !restaurant.getComponent().getAvailableFood().contains(food)).findFirst().orElse(null);
+            double weight = random.nextDouble(0, maxWeight);
+            return List.of(location, restaurant, interval, foodlist, weight);
+        }
+        // TODO: H7.1 - remove if implemented
     }
 
     /**
