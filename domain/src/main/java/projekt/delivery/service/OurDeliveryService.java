@@ -2,9 +2,12 @@ package projekt.delivery.service;
 
 import projekt.delivery.event.Event;
 import projekt.delivery.routing.ConfirmedOrder;
+import projekt.delivery.routing.Region;
+import projekt.delivery.routing.Vehicle;
 import projekt.delivery.routing.VehicleManager;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.tudalgo.algoutils.student.Student.crash;
@@ -19,9 +22,8 @@ public class OurDeliveryService extends AbstractDeliveryService {
 
     @Override
     protected List<Event> tick(long currentTick, List<ConfirmedOrder> newOrders) {
-
-        return crash(); // TODO: H9.2 - remove if implemented
-    }
+        return crash();
+    } //TODO H9.2 - remove if implemented
 
     @Override
     public List<ConfirmedOrder> getPendingOrders() {

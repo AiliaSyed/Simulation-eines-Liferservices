@@ -78,87 +78,46 @@ class EdgeImpl implements Region.Edge {
     }
 
     @Override
-    /**
-     * returns the node of the location A of region
-     * @return node of location A
-     */
     public Region.Node getNodeA() {
-
-        return region.getNode(locationA);
+        return region.getNode(locationA);// TODO: H4.1 - remove if implemented
     }
 
     @Override
-    /**
-     * @User Kristina Shigabutdinova
-     *
-     * returns the node of the location B of  region
-     * @return node of location B
-     */
     public Region.Node getNodeB() {
-        return region.getNode(locationB);
+        return region.getNode(locationB); // TODO: H4.1 - remove if implemented
     }
 
     @Override
-    /**
-     * @User Kristina Shigabutdinova
-     *
-     * uses comparator to compare the actual edge to parameter and returns the result as int number
-     *
-     * @param o the edge to compare to
-     * @return result of comparison as number
-     */
     public int compareTo(Region.@NotNull Edge o) {
-        Comparator<Region.Edge> compNodeA = Comparator.comparing(Region.Edge::getNodeA).thenComparing((Region.Edge::getNodeB));
+        Comparator<Region.Edge> byNodeA = Comparator.comparing((Region.Edge e) -> e.getNodeA(), Comparator.nullsFirst(Comparator.naturalOrder()));
+        Comparator<Region.Edge> byNodeB = Comparator.comparing((Region.Edge e) -> e.getNodeB(), Comparator.nullsFirst(Comparator.naturalOrder()));
 
-        return compNodeA.compare(getNodeA().getEdge(getNodeB()), o);
+        return byNodeA.thenComparing(byNodeB).compare(this, o);
+
     }
+
+        // TODO: H4.2 - remove if implemented
+
     @Override
-    /**
-     * @User Kristina Shigabutdinova
-     * checks if the given Object is to this Object equal
-     *
-     * @param o the object to compare to
-     * @return true if the Objects are equal
-     *         false if not
-     */
     public boolean equals(Object o) {
-        if(o == null)
+        if(o == null || !(o instanceof EdgeImpl))
             return false;
-        else if(!(o instanceof EdgeImpl))
-            return false;
-        else if(this == o)
+        if(o == this)
             return true;
-        else {
-
-            return (Objects.equals(this.name, ((EdgeImpl) o).name)) &&
-                Objects.equals(this.locationA, ((EdgeImpl) o).locationA) &&
-                Objects.equals(this.locationB, ((EdgeImpl) o).locationB) &&
-                Objects.equals(this.duration, ((EdgeImpl) o).duration);
-
-        }
+        return (Objects.equals(this.name, ((EdgeImpl) o).name)
+            && Objects.equals(this.locationA, ((EdgeImpl) o).locationA)
+        && Objects.equals(this.locationB, ((EdgeImpl) o).locationB)
+        && Objects.equals(this.duration, ((EdgeImpl) o).duration));
+        // TODO: H4.3 - remove if implemented
     }
 
     @Override
-    /**
-     * @User Kristina Shigabutdinova
-     *
-     * hashes name, location A, location B, duration
-     */
     public int hashCode() {
-
-        return Objects.hash(name, locationA, locationB, duration);
+        return Objects.hash(name,locationA,locationB,duration); // TODO: H4.4 - remove if implemented
     }
 
     @Override
-    /**
-     * @User Kristina Shigabutdinova
-     *
-     * returns String with values of name, locationA, locationB, duration
-     *
-     * @return String with values of name, locationA, locationB, duration
-     */
     public String toString() {
-
-        return "EdgeImpl(name='%s', locationA='%s', locationB='%s', duration='%s')"+name+locationA+locationB+duration;
+        return "EdgeImpl(name='"+name+"', locationA='"+locationA+"', locationB='"+locationB+"', duration='"+duration+"')" ;// TODO: H4.5 - remove if implemented
     }
 }

@@ -1,12 +1,17 @@
 package projekt.delivery.rating;
 
+import projekt.delivery.event.ArrivedAtNodeEvent;
+import projekt.delivery.event.DeliverOrderEvent;
 import projekt.delivery.event.Event;
 import projekt.delivery.routing.PathCalculator;
 import projekt.delivery.routing.Region;
 import projekt.delivery.routing.VehicleManager;
 import projekt.delivery.simulation.Simulation;
 
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static org.tudalgo.algoutils.student.Student.crash;
 
@@ -23,6 +28,8 @@ public class TravelDistanceRater implements Rater {
     private final Region region;
     private final PathCalculator pathCalculator;
     private final double factor;
+    private double worstDistance = 0.0;
+    private double actualDistance = 0.0;
 
     private TravelDistanceRater(VehicleManager vehicleManager, double factor) {
         region = vehicleManager.getRegion();
@@ -32,15 +39,13 @@ public class TravelDistanceRater implements Rater {
 
     @Override
     public double getScore() {
-        /*if (actualDistance > 0.0 && actualDistance < worstDistance * factor) {
+        if (actualDistance >= 0.0 && actualDistance < worstDistance * factor) {
             return 1.0 - actualDistance / (worstDistance * factor);
         }
         else {
             return 0.0;
         }
 
-         */
-        return crash();
         // TODO: H8.3 - remove if implemented
     }
 
@@ -51,8 +56,49 @@ public class TravelDistanceRater implements Rater {
 
     @Override
     public void onTick(List<Event> events, long tick) {
-        crash();
+        double totalDistance = 0.0;
+
+        // update worstDistance with the distance of all delivered orders
+        for (Event event : events) {
+            if (event instanceof DeliverOrderEvent) {
+                DeliverOrderEvent deliverOrderEvent = (DeliverOrderEvent) event;
+                double distance = getDistance(region.getNode(deliverOrderEvent.getNode().getLocation()),
+                    region.getNode(deliverOrderEvent.getOrder().getLocation()));
+                distance *= 2; // round-trip distance
+                worstDistance += distance;
+            }
+        }
+
+        // update actualDistance with the distance of all vehicles
+        for (Event event : events) {
+            if (event instanceof ArrivedAtNodeEvent arrivedAtNodeEvent) {
+                totalDistance += arrivedAtNodeEvent.getLastEdge().getDuration();
+            }
+        }
+        actualDistance = totalDistance;
+
         // TODO: H8.3 - remove if implemented
+    }
+    private double getDistance(Region.Node startNode, Region.Node endNode) {
+        Deque<Region.Node> path = pathCalculator.getPath(startNode, endNode);
+        Iterator<Region.Node> iterator = path.iterator();
+        int counter = 0;
+        Region.Node from = null;
+        Region.Node to;
+        double distance = 0.0;
+        while (iterator.hasNext()) {
+            if(counter == 0) {
+                from = iterator.next();
+                counter = 1;
+            }
+            else {
+                to = iterator.next();
+                distance += Objects.requireNonNull(region.getEdge(from, to)).getDuration();
+                counter = 0;
+            }
+        }
+
+        return distance;
     }
 
     /**

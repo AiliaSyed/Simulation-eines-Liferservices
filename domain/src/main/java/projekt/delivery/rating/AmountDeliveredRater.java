@@ -19,6 +19,8 @@ public class AmountDeliveredRater implements Rater {
     public static final RatingCriteria RATING_CRITERIA = RatingCriteria.AMOUNT_DELIVERED;
 
     private final double factor;
+    private int totalOrders;
+    private int deliveredOrders;
 
     private AmountDeliveredRater(double factor) {
         this.factor = factor;
@@ -26,15 +28,14 @@ public class AmountDeliveredRater implements Rater {
 
     @Override
     public double getScore() {
-        /*double undeliveredOrders = totalOrders - deliveredOrders;
-        double threshold = totalOrders * (1 - factor);
-         if (undeliveredOrders > 0 && undeliveredOrders < totalOrders * (1 - factor){
-             return 1 - (double) undeliveredOrders / totalOrders;
+        double undeliveredOrders = totalOrders - deliveredOrders;
+         if (undeliveredOrders >= 0 && undeliveredOrders < (totalOrders * (1 - factor))){
+             return (1 - undeliveredOrders /  (totalOrders * (1-factor)));
          }
-         else
-             return 0;
-             */
-        return crash();
+         else{
+            return 0;
+        }
+
         // TODO: H8.1 - remove if implemented
     }
 
@@ -52,7 +53,13 @@ public class AmountDeliveredRater implements Rater {
             // Bestellung wurde aufgenommen
             totalOrders++;
         }*/
-
+        for(Event event : events) {
+            if (event instanceof DeliverOrderEvent) {
+                deliveredOrders++;
+            } else if (event instanceof OrderReceivedEvent) {
+                totalOrders++;
+            }
+        }
         // TODO: H8.1 - remove if implemented
     }
 

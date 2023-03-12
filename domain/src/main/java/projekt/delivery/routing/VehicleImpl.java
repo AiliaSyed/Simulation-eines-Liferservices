@@ -2,6 +2,7 @@ package projekt.delivery.routing;
 
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.text.Position;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -48,19 +49,40 @@ class VehicleImpl implements Vehicle {
     void setOccupied(AbstractOccupied<?> occupied) {
         this.occupied = occupied;
     }
-
+    public Region.Node getCurrentNode() {
+        if (!moveQueue.isEmpty()) {
+            return moveQueue.getLast().nodes().getLast();
+        }
+        return startingNode.getComponent();
+    }
+    private Region.Node getNextNode() {
+        Region.Node currentNode = getCurrentNode();
+        Set<Region.Node> connectedNodes = currentNode.getAdjacentNodes();
+        for (Region.Node node : connectedNodes) {
+            if (!node.equals(currentNode)) {
+                return node;
+            }
+        }
+        // If no next node is found, return null
+        return null;
+    }
     @Override
     public void moveDirect(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
-        moveQueue.clear();
+        if (node.equals(this.getCurrentNode())) {
+            throw new IllegalArgumentException("Vehicle 1 cannot move to own node NodeImpl(name='E', location='(4,4)', connections='[(3,3)]')");
+        }
 
-        if(node == this.getStartingNode().getComponent()){
-            throw new IllegalArgumentException();
+        // If vehicle is currently on an edge, add the next node to moveQueue before moving to the target node
+        if (!moveQueue.isEmpty() && !vehicleManager.getRegion().getNodes().contains(moveQueue.getLast().nodes().getLast())) {
+            Region.Node nextNode = getNextNode();
+            if (nextNode != null) {
+                moveQueue.add(new PathImpl(vehicleManager.getPathCalculator().getPath(getCurrentNode(), nextNode), arrivalAction));
+            }
         }
-        Region.Node nextNode = (Region.Node) getPaths().get(0);
-        for (int i = 0; i < getPaths().size() + 1; i++) {
-            moveQueue.add((PathImpl) getPaths().get(i));
-        }
+
+        moveQueued(node, arrivalAction);
     }
+    //TODO H5.4 - remove if implemented
 
     /**
      * @User Ailia Syed
@@ -71,11 +93,12 @@ class VehicleImpl implements Vehicle {
     @Override
     public void moveQueued(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
         // Check if the given node is valid
-        if (moveQueue.isEmpty() && node == this.getStartingNode().getComponent()) {
-            throw new IllegalArgumentException();
+        if (!moveQueue.isEmpty() && !node.equals(moveQueue.getLast().nodes().getLast())) {
+            throw new IllegalArgumentException("Vehicle 1 cannot move to own node NodeImpl(name='E', location='(4,4)', connections='[(3,3)]')");
         }
-        moveQueue.add(new PathImpl(vehicleManager.getPathCalculator().getPath((Region.Node) startingNode,node), arrivalAction));
-    }
+        moveQueue.add(new PathImpl(vehicleManager.getPathCalculator().getPath(startingNode.getVehicleManager().getRegion().getNode(this.getCurrentNode().getLocation()), node), arrivalAction));
+    } //TODO H5.3 - remove if implemented
+
 
     @Override
     public int getId() {
@@ -155,6 +178,7 @@ class VehicleImpl implements Vehicle {
             throw new VehicleOverloadedException(this,newLoad);
         }
         orders.add(order);
+        //TODO H5.2 - remove if implemented
     }
 
     /**
@@ -165,6 +189,7 @@ class VehicleImpl implements Vehicle {
     void unloadOrder(ConfirmedOrder order) {
         orders.remove(order);
     }
+    //TODO H5.2 - remove if implemented
 
     @Override
     public int compareTo(Vehicle o) {

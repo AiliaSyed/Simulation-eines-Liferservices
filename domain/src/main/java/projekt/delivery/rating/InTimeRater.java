@@ -1,8 +1,10 @@
 package projekt.delivery.rating;
 
+import projekt.base.TickInterval;
 import projekt.delivery.event.Event;
 import projekt.delivery.routing.ConfirmedOrder;
 import projekt.delivery.simulation.Simulation;
+import projekt.delivery.event.*;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ public class InTimeRater implements Rater {
 
     private final long ignoredTicksOff;
     private final long maxTicksOff;
+    private long actualTotalTicksOff = 0;
+    private long maxTotalTicksOff = 0;
 
     /**
      * Creates a new {@link InTimeRater} instance.
@@ -35,21 +39,43 @@ public class InTimeRater implements Rater {
 
     @Override
     public double getScore() {
-        /*if (maxTicksOff == 0) {
+        if (maxTotalTicksOff == 0) {
             return 0;
         } else {
             double score = 1 - (double) actualTotalTicksOff / maxTicksOff;
             return Math.max(0, score);
         }
 
-         */
-        return crash();
         // TODO: H8.2 - remove if implemented
     }
 
     @Override
     public void onTick(List<Event> events, long tick) {
-        crash();
+        for (Event event : events) {
+            if (event instanceof DeliverOrderEvent deliverEvent) {
+                ConfirmedOrder order = deliverEvent.getOrder();
+                TickInterval deliveryInterval = order.getDeliveryInterval();
+                long actualTicksOff = tick - deliveryInterval.end();
+                if (actualTicksOff > ignoredTicksOff) {
+                    actualTicksOff -= ignoredTicksOff;
+                    if (actualTicksOff > maxTicksOff) {
+                        actualTicksOff = maxTicksOff;
+                    }
+                    actualTotalTicksOff += actualTicksOff;
+                }
+                maxTotalTicksOff += maxTicksOff;
+            } else if (event instanceof OrderReceivedEvent orderReceivedEvent) {
+                ConfirmedOrder order = orderReceivedEvent.getOrder();
+                TickInterval deliveryInterval = order.getDeliveryInterval();
+                long maxTicksOffForOrder = Math.min(deliveryInterval.getDuration(), maxTicksOff + ignoredTicksOff);
+                maxTotalTicksOff += maxTicksOffForOrder;
+                if (deliveryInterval.end() < tick) {
+                    actualTotalTicksOff += maxTicksOffForOrder;
+                } else if (deliveryInterval.start() < tick) {
+                    actualTotalTicksOff += tick - deliveryInterval.start();
+                }
+            }
+        }
         // TODO: H8.2 - remove if implemented
     }
 

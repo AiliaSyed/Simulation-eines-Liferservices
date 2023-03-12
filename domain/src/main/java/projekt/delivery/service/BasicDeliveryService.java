@@ -58,8 +58,8 @@ public class BasicDeliveryService extends AbstractDeliveryService {
             }
 
         }
-            return r;
-    }
+        return r;
+    } //TODO H9.1 - remove if implemented
 
     @Override
     public List<ConfirmedOrder> getPendingOrders() {

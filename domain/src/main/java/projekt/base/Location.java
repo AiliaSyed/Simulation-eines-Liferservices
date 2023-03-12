@@ -82,8 +82,10 @@ public final class Location implements Comparable<Location> {
 
     @Override
     public int hashCode() {
-        int hash = 31 * x + y;
-        return hash + 100000; // TODO: H1.2 - remove if implemented
+        int result = 31; // wähle eine beliebige Primzahl als Startwert
+        result = 163 * result + x; // Multiplikation mit einer anderen Primzahl und Addition von x
+        result = 163 * result + y; // Multiplikation mit derselben Primzahl und Addition von y
+        return result;// TODO: H1.2 - remove if implemented
     }
 
     @Override

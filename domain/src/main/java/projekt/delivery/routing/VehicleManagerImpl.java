@@ -36,23 +36,23 @@ class VehicleManagerImpl implements VehicleManager {
      * @return
      */
     private Map<Region.Node, OccupiedNodeImpl<? extends Region.Node>> toOccupiedNodes(Collection<Region.Node> nodes) {
-        Map<Region.Node, OccupiedNodeImpl<?>> occupiedNodes = new HashMap<>();
-        for (Region.Node node : nodes) {
-            if (node instanceof Region.Restaurant) {
-                Region.Restaurant restaurant = (Region.Restaurant) node;
-                OccupiedRestaurantImpl occupiedRestaurant = new OccupiedRestaurantImpl(restaurant, this);
-                occupiedNodes.put(restaurant, occupiedRestaurant);
-            } else if (node instanceof Region.Neighborhood) {
-                Region.Neighborhood neighborhood = (Region.Neighborhood) node;
-                OccupiedNeighborhoodImpl occupiedNeighborhood = new OccupiedNeighborhoodImpl(neighborhood, this);
-                occupiedNodes.put(neighborhood, occupiedNeighborhood);
-            } else {
-                OccupiedNodeImpl<Region.Node> occupiedNode = new OccupiedNodeImpl<>(node, this);
-                occupiedNodes.put(node, occupiedNode);
+        Map<Region.Node, OccupiedNodeImpl<? extends Region.Node>> finalMap = new HashMap<>();
+        for(Region.Node currentNode : nodes){
+            if(currentNode instanceof Region.Restaurant){
+                OccupiedRestaurantImpl newNode = new OccupiedRestaurantImpl((Region.Restaurant) currentNode, this);
+                finalMap.put(currentNode,newNode);
+            }
+            else if(currentNode instanceof Region.Neighborhood){
+                OccupiedNeighborhoodImpl newNode = new OccupiedNeighborhoodImpl((Region.Neighborhood) currentNode, this);
+                finalMap.put(currentNode,newNode);
+            }
+            else {
+                OccupiedNodeImpl newNode = new OccupiedNodeImpl(currentNode, this);
+                finalMap.put(currentNode, newNode);
             }
         }
-        return Collections.unmodifiableMap(occupiedNodes);
-    }
+        return Collections.unmodifiableMap(finalMap);
+    } //TODO H6.1 - remove if implemented
 
     /**
      * @User Ailia Syed
@@ -66,18 +66,18 @@ class VehicleManagerImpl implements VehicleManager {
             occupiedEdges.put(edge, occupiedEdge);
         }
         return Collections.unmodifiableMap(occupiedEdges);
-    }
+    } //TODO H6.1 - remove if implemented
 
     /**
      * @User Ailia Syed
      * @return unmodified set with all attributes of occupiedNodes und occupiedEdges
      */
     private Set<AbstractOccupied<?>> getAllOccupied() {
-        Set<VehicleManager.Occupied<?>> allOccupied = new HashSet<>();
+        Set<AbstractOccupied<?>> allOccupied = new HashSet<>();
         allOccupied.addAll(occupiedNodes.values());
         allOccupied.addAll(occupiedEdges.values());
-        return null;
-    }
+        return Collections.unmodifiableSet(allOccupied);
+    }//TODO H6.2 - remove if implemented
 
     private OccupiedNodeImpl<? extends Region.Node> getOccupiedNode(Location location) {
         return occupiedNodes.values().stream()
@@ -110,8 +110,28 @@ class VehicleManagerImpl implements VehicleManager {
 
     @Override
     public <C extends Region.Component<C>> AbstractOccupied<C> getOccupied(C component) {
-        return crash(); // TODO: H6.3 - remove if implemented
-    }
+        Objects.requireNonNull(component, "Component is null!");
+        if (component instanceof Region.Node) {
+            Collection<Occupied<? extends Region.Node>> occupiedNodes = getOccupiedNodes();
+            for (Occupied<? extends Region.Node> node : occupiedNodes) {
+                if (node.getComponent().equals(component)) {
+                    return (AbstractOccupied<C>) node;
+                }
+            }
+            throw new IllegalArgumentException("Could not find occupied node for " + component.toString());
+        } else if (component instanceof Region.Edge) {
+            Collection<Occupied<? extends Region.Edge>> occupiedEdges = getOccupiedEdges();
+            for (Occupied<? extends Region.Edge> edge : occupiedEdges) {
+                if (edge.getComponent().equals(component)) {
+                    return (AbstractOccupied<C>) edge;
+                }
+            }
+            throw new IllegalArgumentException("Could not find occupied edge for " + component.toString());
+        } else {
+            throw new IllegalArgumentException("Component is not of recognized subtype: " + component.getClass().getName());
+        }
+    }// TODO: H6.3 - remove if implemented
+
 
     @Override
     public List<OccupiedRestaurant> getOccupiedRestaurants() {
@@ -123,8 +143,15 @@ class VehicleManagerImpl implements VehicleManager {
 
     @Override
     public OccupiedRestaurant getOccupiedRestaurant(Region.Node node) {
-        return crash(); // TODO: H6.4- remove if implemented
-    }
+        if(node == null)
+        {
+            throw new NullPointerException("Node is null!");
+        }
+        if(!occupiedNodes.containsKey(node) || !(occupiedNodes.get(node) instanceof OccupiedRestaurant)) {
+            throw new IllegalArgumentException("Node " + node.toString() + " is not a restaurant");
+        }
+        return (OccupiedRestaurant) occupiedNodes.get(node);
+    }//TODO H6.4 - remove if implemented
 
     @Override
     public Collection<OccupiedNeighborhood> getOccupiedNeighborhoods() {
@@ -136,8 +163,15 @@ class VehicleManagerImpl implements VehicleManager {
 
     @Override
     public OccupiedNeighborhood getOccupiedNeighborhood(Region.Node node) {
-        return crash(); // TODO: H6.4 - remove if implemented
-    }
+        if(node == null)
+        {
+            throw new NullPointerException("Node is null!");
+        }
+        if(!occupiedNodes.containsKey(node) || !(occupiedNodes.get(node) instanceof OccupiedNeighborhood)) {
+            throw new IllegalArgumentException("Node " + node.toString() + " is not a neighborhood");
+        }
+        return (OccupiedNeighborhood) occupiedNodes.get(node);
+    } //TODO H6.4 - remove if implemented
 
     @Override
     public Collection<Occupied<? extends Region.Node>> getOccupiedNodes() {

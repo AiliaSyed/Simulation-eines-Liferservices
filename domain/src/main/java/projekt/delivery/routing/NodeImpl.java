@@ -3,6 +3,8 @@ package projekt.delivery.routing;
 import org.jetbrains.annotations.Nullable;
 import projekt.base.Location;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -55,81 +57,75 @@ class NodeImpl implements Region.Node {
 
     @Override
     public @Nullable Region.Edge getEdge(Region.Node other) {
-
-
-        if (region.getNode(location).getEdge(other) != null){
-            return region.getNode(location).getEdge(other);
+        if (!region.getNodes().contains(this) || !region.getNodes().contains(other)) {
+            return null;
         }
+
+        for (Region.Edge edge : region.getEdges()) {
+            if (edge.getNodeA().equals(this) && edge.getNodeB().equals(other)) {
+                return edge;
+            }
+            if (edge.getNodeA().equals(other) && edge.getNodeB().equals(this)) {
+                return edge;
+            }
+        }
+
         return null;
-
-        // TODO: H3.1 - remove if implemented
-
-    }
+    } // TODO: H3.1 - remove if implemented
 
     @Override
     public Set<Region.Node> getAdjacentNodes() {
-        Set<Region.Node> adjacentNodes = null;
-        for(Region.Node node : region.getNodes()){
-            if (region.getNode(location).getEdge(node) != null) {
-                adjacentNodes.add(node);
-            }
-        }
-        if (adjacentNodes.isEmpty()) {
-            adjacentNodes.add(this);
+        Set<Region.Node> adjacentNodes = new HashSet<Region.Node>();
+        Collection<Region.Edge> allEdges = region.getEdges();
+        for(Region.Edge edge : allEdges){
+            if(edge.getNodeA() == region.getNode(location))
+                adjacentNodes.add(edge.getNodeB());
+            if(edge.getNodeB() == region.getNode(location))
+                adjacentNodes.add(edge.getNodeA());
         }
         return adjacentNodes;
-
-        // TODO: H3.2 - remove if implemented
+         // TODO: H3.2 - remove if implemented
     }
 
     @Override
     public Set<Region.Edge> getAdjacentEdges() {
-
-        Set<Region.Edge> adjacentEdges = null;
-        adjacentEdges.addAll(region.getEdges());
-        for (Region.Edge edge : region.getEdges()) {
-            if(region.getNode(location).getEdge((Region.Node) edge) != null){
+        Set<Region.Edge> adjacentEdges = new HashSet<Region.Edge>();
+        Collection<Region.Edge> allEdges = region.getEdges();
+        for(Region.Edge edge : allEdges){
+            if(edge.getNodeA() == region.getNode(location))
                 adjacentEdges.add(edge);
-            }
+            if(edge.getNodeB() == region.getNode(location))
+                adjacentEdges.add(edge);
         }
         return adjacentEdges;
-
         // TODO: H3.3 - remove if implemented
     }
 
     @Override
     public int compareTo(Region.Node o) {
-        return location.compareTo(o.getLocation());
-         // TODO: H3.4 - remove if implemented
+         return this.getLocation().compareTo(o.getLocation());// TODO: H3.4 - remove if implemented
     }
 
     @Override
     public boolean equals(Object o) {
-        NodeImpl other = (NodeImpl) o;
-        if (o == null || !(o instanceof NodeImpl)){
+        if(o == null || !(o instanceof NodeImpl))
             return false;
-        }
-
-        if ( o == this ||
-            (Objects.equals(this.name, other. name) && Objects.equals( this.location, other.location) && Objects.equals(this.connections, other.connections))){
+        if(o == this)
             return true;
-        }
-        else
-            return false;
-
+        return (Objects.equals(this.name, ((NodeImpl) o).name)
+            && Objects.equals(this.location, ((NodeImpl) o).location)
+            && Objects.equals(this.connections, ((NodeImpl) o).connections));
         // TODO: H3.5 - remove if implemented
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, location, connections);
-
-        // TODO: H3.6 - remove if implemented
+        return Objects.hash(name, location, connections); // TODO: H3.6 - remove if implemented
     }
 
     @Override
     public String toString() {
-        return "NodeImpl(name=" +getName()+ ", location=" +getLocation()+ ", connections= " +getConnections()+ ")";
+        return "NodeImpl(name='"+ name + "', location='" + location +"', connections='" + connections +"')";
         // TODO: H3.7 - remove if implemented
     }
 }

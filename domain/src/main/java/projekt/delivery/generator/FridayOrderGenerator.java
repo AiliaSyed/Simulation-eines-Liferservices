@@ -1,13 +1,15 @@
 package projekt.delivery.generator;
 
+import projekt.base.Location;
+import projekt.base.TickInterval;
 import projekt.delivery.routing.ConfirmedOrder;
 import projekt.delivery.routing.VehicleManager;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-
-import static org.tudalgo.algoutils.student.Student.crash;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.io.Serializable;
 
 /**
  * An implementation of an {@link OrderGenerator} that represents the incoming orders on an average friday evening.
@@ -15,9 +17,18 @@ import static org.tudalgo.algoutils.student.Student.crash;
  *
  * To create a new {@link FridayOrderGenerator} use {@code FridayOrderGenerator.Factory.builder()...build();}.
  */
-public class FridayOrderGenerator implements OrderGenerator {
+public class FridayOrderGenerator implements OrderGenerator, Serializable {
 
     private final Random random;
+    private final int orderCount;
+    private final VehicleManager vehicleManager;
+    private final int deliveryInterval;
+    private final double maxWeight;
+    private final double standardDeviation;
+    private final long lastTick;
+    private final int seed;
+    private final List<Integer> tickList;
+    private Map<Integer, List<ConfirmedOrder>> ordersByTick;
 
     /**
      * Creates a new {@link FridayOrderGenerator} with the given parameters.
@@ -32,12 +43,67 @@ public class FridayOrderGenerator implements OrderGenerator {
      */
     private FridayOrderGenerator(int orderCount, VehicleManager vehicleManager, int deliveryInterval, double maxWeight, double standardDeviation, long lastTick, int seed) {
         random = seed < 0 ? new Random() : new Random(seed);
-        crash(); // TODO: H7.1 - remove if implemented
+        this.orderCount = orderCount;
+        this.vehicleManager = vehicleManager;
+        this.deliveryInterval = deliveryInterval;
+        this.maxWeight = maxWeight;
+        this.standardDeviation = standardDeviation;
+        this.lastTick = lastTick;
+        this.seed = seed;
+        this.ordersByTick = new HashMap<>();
+        // Generate the list of ticks for each order
+        double mean = (lastTick - 0) / 2.0;
+        tickList = new ArrayList<>(orderCount);
+        for (int i = 0; i < orderCount; i++) {
+            double scaledValue = random.nextGaussian(mean, standardDeviation) * (lastTick - 0) / (2 * standardDeviation) + (lastTick + 0) / 2.0;
+            int tick = (int) Math.round(scaledValue);
+            tickList.add(tick);
+        }
+
+        // TODO: H7.1 - remove if implemented
     }
 
     @Override
     public List<ConfirmedOrder> generateOrders(long tick) {
-        return crash(); // TODO: H7.1 - remove if implemented
+        if (tick < 0) {
+            throw new IndexOutOfBoundsException(tick);
+        }
+
+        // Return pre-generated orders if the tick matches
+        if(ordersByTick != null) {
+            if (ordersByTick.containsKey((int) tick)) {
+                return ordersByTick.get((int) tick);
+            }
+        }
+
+        List<ConfirmedOrder> orders = new ArrayList<>();
+        for (int i = 0; i < orderCount; i++) {
+            int tickValue = tickList.get(i);
+            if (tickValue == tick) {
+                Location location = Objects.requireNonNull(vehicleManager.getOccupiedNeighborhoods().stream()
+                    .skip((int) (vehicleManager.getOccupiedNeighborhoods().size() * random.nextDouble()))
+                    .findFirst().orElse(null)).getComponent().getLocation();
+                VehicleManager.OccupiedRestaurant restaurant = vehicleManager.getOccupiedRestaurants().stream()
+                    .skip((int) (vehicleManager.getOccupiedNeighborhoods().size() * random.nextDouble()))
+                    .findFirst().orElse(null);
+                List<String> foodList = restaurant != null ? Stream.of(restaurant.getComponent().getAvailableFood())
+                    .flatMap(list -> list.stream()).toList()
+                    : Collections.emptyList();
+                int numFoods = random.nextInt(9) + 1;
+                List<String> foods = new ArrayList<>();
+                for (int k = 0; k < numFoods; k++) {
+                    String food = foodList.get(random.nextInt(foodList.size()));
+                    foods.add(food);
+                }
+                double weight = random.nextDouble() * maxWeight;
+                TickInterval deliveryInterval = new TickInterval(tick, tick + this.deliveryInterval);
+                orders.add(new ConfirmedOrder(location, restaurant, deliveryInterval, foodList, weight));
+            }
+        }
+        //put new orders by tick in Map
+        ordersByTick.put((int) tick, orders);
+        return orders;
+         // TODO: H7.1 - remove if implemented
     }
 
     /**

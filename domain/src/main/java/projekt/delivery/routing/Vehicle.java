@@ -102,6 +102,7 @@ public interface Vehicle extends Comparable<Vehicle> {
             currentWeight += order.getWeight();
         }
         return currentWeight;
+        //TODO H5.1 - remove if implemented
     }
 
     /**
