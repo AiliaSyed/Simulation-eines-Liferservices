@@ -105,6 +105,7 @@ public interface Vehicle extends Comparable<Vehicle> {
         //TODO H5.1 - remove if implemented
     }
 
+
     /**
      * Represents a path from one {@link Region.Node} to another {@link Region.Node}.<p>
      *

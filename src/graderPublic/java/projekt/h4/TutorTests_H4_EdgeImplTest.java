@@ -1,4 +1,4 @@
-package projekt.h2.h4;
+package projekt.h4;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

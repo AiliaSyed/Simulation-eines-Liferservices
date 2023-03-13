@@ -73,6 +73,11 @@ public class ConfirmedOrder implements Serializable {
         return location.getX();
     }
 
+    //getDeliveryTime for OurDeliveryService
+    public int getDeliveryTime() {
+        return (int) deliveryInterval.getDuration();
+    }
+
     /**
      * Returns the y-coordinate to deliver the {@link ConfirmedOrder} to.
      * @return The y-coordinate to deliver the {@link ConfirmedOrder} to.

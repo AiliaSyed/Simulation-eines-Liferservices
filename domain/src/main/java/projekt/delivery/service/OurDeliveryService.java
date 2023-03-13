@@ -9,22 +9,41 @@ import projekt.delivery.routing.VehicleManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.RecursiveTask;
 
 import static org.tudalgo.algoutils.student.Student.crash;
 
 public class OurDeliveryService extends AbstractDeliveryService {
 
     protected final List<ConfirmedOrder> pendingOrders = new ArrayList<>();
+    private long currentTime;
 
     public OurDeliveryService(VehicleManager vehicleManager) {
         super(vehicleManager);
     }
-
     @Override
     protected List<Event> tick(long currentTick, List<ConfirmedOrder> newOrders) {
-        return crash();
+            for (ConfirmedOrder order : newOrders) {
+                pendingOrders.add(order);
+            }
+            pendingOrders.sort(Comparator.comparing(ConfirmedOrder::getDeliveryTime));
+            for (ConfirmedOrder order : pendingOrders) {
+                if (order.getDeliveryTime() <= currentTime) {
+                    pendingOrders.remove(order);
+                }
+            }
+            for (Vehicle vehicle : vehicleManager.getVehicles()) {
+                if (true) {
+                    for (ConfirmedOrder order : pendingOrders) {
+                        if (order.getDeliveryTime() <= currentTime) {
+                            pendingOrders.remove(order);
+                        }
+                    }
+                }
+            }
+            currentTime++;
+            return null;
     } //TODO H9.2 - remove if implemented
-
     @Override
     public List<ConfirmedOrder> getPendingOrders() {
         return pendingOrders;
@@ -34,6 +53,7 @@ public class OurDeliveryService extends AbstractDeliveryService {
     public void reset() {
         super.reset();
         pendingOrders.clear();
+        currentTime = 0;
     }
 
     public interface Factory extends DeliveryService.Factory {

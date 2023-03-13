@@ -6,7 +6,7 @@ import projekt.h1.TutorTests_H1_LocationTest;
 import projekt.h10.TutorTests_H10_RunnerImplTest;
 import projekt.h2.TutorTests_H2_RegionImplTest;
 import projekt.h3.TutorTests_H3_NodeImplTest;
-import projekt.h2.h4.TutorTests_H4_EdgeImplTest;
+import projekt.h4.TutorTests_H4_EdgeImplTest;
 import projekt.h5.TutorTests_H5_VehicleTest;
 import projekt.h6.TutorTests_H6_VehicleManager;
 import projekt.h7.TutorTests_H7_OrderGeneratorTest;
