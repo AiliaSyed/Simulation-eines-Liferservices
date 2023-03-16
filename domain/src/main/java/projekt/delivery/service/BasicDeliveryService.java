@@ -28,6 +28,8 @@ public class BasicDeliveryService extends AbstractDeliveryService {
 
 
     /**
+     * @User Kristina Shigabutdinova
+     *
      * This method gets the current tick of the simulation and the newly added orders. It manages all the vehicles to
      * restaurants that next to them are (may to be changed)
      * @param currentTick The tick to execute.
@@ -54,10 +56,25 @@ public class BasicDeliveryService extends AbstractDeliveryService {
                 while (vehicle.getCapacity() > 0 && !pendingOrders.isEmpty()) {
                     pendingOrders.remove(0);
                 }
-
             }
 
+
+            //moving to each point
+            for (Vehicle vehicle : vehicleManager.getVehicles()) {
+                VehicleManager.OccupiedNeighborhood neighborhood = vehicleManager.getOccupiedNeighborhood(vehicle.getStartingNode().getComponent());
+                for(ConfirmedOrder order : newOrders) {
+
+                    neighborhood.deliverOrder(vehicle, order, currentTick);
+
+                }
+                if(vehicle.getOrders().isEmpty()){
+                    vehicle.moveQueued(neighborhood.getComponent());
+                }
+            }
         }
+
+
+
         return r;
     } //TODO H9.1 - remove if implemented
 
