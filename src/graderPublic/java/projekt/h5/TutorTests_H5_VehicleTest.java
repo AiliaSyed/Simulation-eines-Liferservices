@@ -132,11 +132,11 @@ public class TutorTests_H5_VehicleTest {
             callLoadOrder(vehicle, order2);
         } catch (InvocationTargetException e) {
             assertTrue(e.getCause() instanceof VehicleOverloadedException, context,
-                TR -> "Vehicle.loadOrder(ConfirmedOrder) did not throw an IllegalArgumentException when the order could not be loaded");
+                TR -> "Vehicle.loadOrder(ConfirmedOrder) did not throw an VehicleOverloadedException when the order could not be loaded");
             assertEquals("Vehicle with id %d is overloaded! Maximum capacity: %f Necessary capacity: %f"
                     .formatted(vehicle.getId(), vehicle.getCapacity(), order1.getWeight() + order2.getWeight() + order3.getWeight()),
                 e.getCause().getMessage(), context,
-                TR -> "Vehicle.loadOrder(ConfirmedOrder) did not throw an IllegalArgumentException with the correct message when the order could not be loaded");
+                TR -> "Vehicle.loadOrder(ConfirmedOrder) did not throw an VehicleOverloadedException with the correct message when the order could not be loaded");
         }
 
     }
@@ -250,23 +250,20 @@ public class TutorTests_H5_VehicleTest {
     @Test
     public void testMoveQueuedException() {
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", locationE)
             .add("input", locationE)
             .build();
 
-        try {
-            vehicle.moveQueued(restaurantE, (v, t) -> {});
-        } catch (IllegalArgumentException e) {
-            assertEquals("Vehicle " + vehicle.getId() + " cannot move to own node " + restaurantE.toString(), e.getMessage(), context,
-                TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not throw an IllegalArgumentException with the correct message when the node to move to was the currently occupied node");
-        }
+        assertThrows(IllegalArgumentException.class, () -> vehicle.moveQueued(restaurantE, (v, t) -> {
+            }), context,
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not throw an IllegalArgumentException when the node to move to was the currently occupied node");
     }
 
     @Test
     public void testMoveQueuedArrivalAction() throws ReflectiveOperationException {
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", locationA)
             .add("input", locationB)
             .build();
@@ -278,7 +275,7 @@ public class TutorTests_H5_VehicleTest {
         Deque<Vehicle.Path> moveQueue = getMoveQueueOfVehicle(vehicle);
 
         assertEquals(1, moveQueue.size(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the path to the move queue or added to many paths");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the path to the move queue or added to many paths");
 
         moveQueue.getFirst().arrivalAction().accept(vehicle, 0L);
 
@@ -289,7 +286,7 @@ public class TutorTests_H5_VehicleTest {
     @Test
     public void testMoveQueuedNoNodeInQueue() throws ReflectiveOperationException {
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", restaurantE)
             .add("input", locationA)
             .build();
@@ -306,24 +303,24 @@ public class TutorTests_H5_VehicleTest {
         Deque<Vehicle.Path> moveQueue = getMoveQueueOfVehicle(vehicle);
 
         assertEquals(1, moveQueue.size(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the path to the move queue or added to many paths");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the path to the move queue or added to many paths");
 
         assertEquals(expectedNodes, moveQueue.getFirst().nodes(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the correct path to the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the correct path to the move queue");
 
         verify(vehicleManager.getPathCalculator(), times(1)).getPath(any(), any());
 
         assertEquals(restaurantE, startCaptor.getValue(), context,
-           TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct start node to the getPath method of the path calculator");
+           TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct start node to the getPath method of the path calculator");
 
         assertEquals(nodeA, endCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct end node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct end node to the getPath method of the path calculator");
     }
 
     @Test
     public void testMoveQueuedOneNodeInQueue() throws ReflectiveOperationException {
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", restaurantE)
             .add("move queue", List.of(locationD, locationC))
             .add("input", locationA)
@@ -347,25 +344,25 @@ public class TutorTests_H5_VehicleTest {
             TR -> "The size of the move queue is incorrect");
 
         assertEquals(originalPath, moveQueue.pop(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) altered the first path in the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) altered the first path in the move queue");
 
         assertEquals(expectedNodes, moveQueue.pop().nodes(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the correct path to the end queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the correct path to the end queue");
 
         verify(vehicleManager.getPathCalculator(), times(1)).getPath(any(), any());
 
         assertEquals(nodeC, startCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct start node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct start node to the getPath method of the path calculator");
 
         assertEquals(nodeA, endCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct end node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct end node to the getPath method of the path calculator");
     }
 
     @Test
     public void testMoveQueuedMultipleNodesInQueue1() throws ReflectiveOperationException {
 
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", restaurantE)
             .add("move queue", List.of(List.of(locationD, locationC), List.of(locationB, locationC)))
             .add("input", locationA)
@@ -392,21 +389,21 @@ public class TutorTests_H5_VehicleTest {
             TR -> "The size of the move queue is incorrect");
 
         assertEquals(originalPath1, moveQueue.pop(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) altered the first path in the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) altered the first path in the move queue");
 
         assertEquals(originalPath2, moveQueue.pop(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) altered the second path in the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) altered the second path in the move queue");
 
         assertEquals(expectedNodes, moveQueue.pop().nodes(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the correct path to the end queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the correct path to the end queue");
 
         verify(vehicleManager.getPathCalculator(), times(1)).getPath(any(), any());
 
         assertEquals(nodeC, startCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct start node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct start node to the getPath method of the path calculator");
 
         assertEquals(nodeA, endCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct end node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct end node to the getPath method of the path calculator");
 
     }
 
@@ -415,7 +412,7 @@ public class TutorTests_H5_VehicleTest {
     public void testMoveQueuedMultipleNodesInQueue2() throws ReflectiveOperationException {
 
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveQueued(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveQueued(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", restaurantE)
             .add("move queue", List.of(List.of(locationD, locationC), List.of(locationB)))
             .add("input", locationA)
@@ -442,44 +439,41 @@ public class TutorTests_H5_VehicleTest {
             TR -> "The size of the move queue is incorrect");
 
         assertEquals(originalPath1, moveQueue.pop(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) altered the first path in the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) altered the first path in the move queue");
 
         assertEquals(originalPath2, moveQueue.pop(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) altered the second path in the move queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) altered the second path in the move queue");
 
         assertEquals(expectedNodes, moveQueue.pop().nodes(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not add the correct path to the end queue");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not add the correct path to the end queue");
 
         verify(vehicleManager.getPathCalculator(), times(1)).getPath(any(), any());
 
         assertEquals(nodeC, startCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct start node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct start node to the getPath method of the path calculator");
 
         assertEquals(nodeA, endCaptor.getValue(), context,
-            TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not pass the correct end node to the getPath method of the path calculator");
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not pass the correct end node to the getPath method of the path calculator");
     }
 
     @Test
     public void testMoveDirectException() {
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveDirect(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveDirect(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", locationE)
             .add("input", locationE)
             .build();
 
-        try {
-            vehicle.moveDirect(restaurantE, (v, t) -> {});
-        } catch (IllegalArgumentException e) {
-            assertEquals("Vehicle " + vehicle.getId() + " cannot move to own node " + restaurantE.toString(), e.getMessage(), context,
-                TR -> "Vehicle.moveQueued(Node, Consumer<Vehicle>) did not throw an IllegalArgumentException with the correct message when the node to move to was the currently occupied node");
-        }
+        assertThrows(IllegalArgumentException.class, () -> vehicle.moveDirect(restaurantE, (v, t) -> {
+            }), context,
+            TR -> "Vehicle.moveQueued(Node, BiConsumer<Vehicle, Long>) did not throw an IllegalArgumentException when the node to move to was the currently occupied node");
     }
 
     @Test
     public void testMoveDirectClear() throws ReflectiveOperationException {
 
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveDirect(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveDirect(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", locationE)
             .add("move queue", List.of(List.of(locationD, locationC), List.of(locationB)))
             .add("input", locationA)
@@ -500,14 +494,14 @@ public class TutorTests_H5_VehicleTest {
         Deque<Vehicle.Path> moveQueue = getMoveQueueOfVehicle(vehicle);
 
         assertEquals(0, moveQueue.size(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not clear the move queue");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not clear the move queue");
     }
 
     @Test
     public void testMoveDirectOnNode() {
 
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveDirect(Node, Consumer<Vehicle>)")
+            .subject("VehicleImpl#moveDirect(Node, BiConsumer<Vehicle, Long>)")
             .add("current node", locationE)
             .add("input", nodeA)
             .build();
@@ -522,29 +516,33 @@ public class TutorTests_H5_VehicleTest {
         verify(vehicle, times(1)).moveQueued(any(), any());
 
         assertEquals(nodeA, nodeCaptor.getValue(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not pass the correct node to the moveQueued method");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct node to the moveQueued method");
 
         assertEquals(arrivalAction, arrivalActionCaptor.getValue(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not pass the correct arrival action to the moveQueued method");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct arrival action to the moveQueued method");
     }
 
     @SuppressWarnings({"JavaReflectionInvocation"})
     @Test
-    public void testMoveDirectOnEdge() throws ReflectiveOperationException {
+    public void testMoveDirectOnEdgeToNodeA() throws ReflectiveOperationException {
 
         Context context = contextBuilder()
-            .subject("VehicleImpl#moveDirect(Node, Consumer<Vehicle>)")
-            .add("current edgeA", locationE)
-            .add("current edgeB", locationD)
+            .subject("VehicleImpl#moveDirect(Node, BiConsumer<Vehicle, Long>)")
+            .add("current nodeA", locationD)
+            .add("current nodaB", locationE)
+            .add("movement to", locationD)
             .add("input", locationA)
             .build();
 
         Vehicle vehicle = spy(createVehicle(2, 10, vehicleManager, vehicleManager.getOccupiedRestaurant(restaurantE)));
-        addVehicleToVehicleManager(vehicleManager, vehicle, vehicleManager.getOccupied(restaurantE));
+        addVehicleToVehicleManager(vehicleManager, vehicle, vehicleManager.getOccupiedRestaurant(restaurantE));
 
-        BiConsumer<Vehicle, Long> arrivalAction = (v, t) -> {};
+        BiConsumer<Vehicle, Long> arrivalAction = (v, t) -> {
+        };
 
         getMoveQueueOfVehicle(vehicle).clear();
+        getMoveQueueOfVehicle(vehicle).push(createPath(new LinkedList<>(List.of(nodeD, nodeC)), (v, t) -> {
+        }));
 
         Method addVehicle = VehicleManager.Occupied.class.getDeclaredMethod("addVehicle", Class.forName("projekt.delivery.routing.VehicleImpl"), long.class);
         addVehicle.setAccessible(true);
@@ -557,7 +555,7 @@ public class TutorTests_H5_VehicleTest {
         verify(vehicle, times(1)).moveQueued(any(), any());
 
         assertEquals(1, getMoveQueueOfVehicle(vehicle).size(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not add a the path to the next node to the move queue or added to many when the vehicle is on an edge");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not add a the path to the next node to the move queue or added to many when the vehicle is on an edge");
 
         Deque<Region.Node> nodes = getMoveQueueOfVehicle(vehicle).pop().nodes();
 
@@ -565,14 +563,64 @@ public class TutorTests_H5_VehicleTest {
             TR -> "The first path added to the move queue does not contain the correct number of nodes when the vehicle is on an edge");
 
         assertEquals(nodeD, nodes.pop(), context,
-            TR -> "The first path added to the move queue does not contain the correct node when the vehicle is on an edge");
+            TR -> "The first path added to the move queue does not contain the node the vehicle previously moved to when the vehicle is on an edge");
 
         assertEquals(nodeA, nodeCaptor.getValue(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not pass the correct node to the moveQueued method");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct node to the moveQueued method");
 
         assertEquals(arrivalAction, arrivalActionCaptor.getValue(), context,
-            TR -> "Vehicle.moveDirect(Node, Consumer<Vehicle>) did not pass the correct arrival action to the moveQueued method");
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct arrival action to the moveQueued method");
+    }
 
+    @SuppressWarnings({"JavaReflectionInvocation"})
+    @Test
+    public void testMoveDirectOnEdgeToNodeB() throws ReflectiveOperationException {
+
+        Context context = contextBuilder()
+            .subject("VehicleImpl#moveDirect(Node, BiConsumer<Vehicle, Long>)")
+            .add("current nodeA", locationD)
+            .add("current nodaB", locationE)
+            .add("movement to", locationE)
+            .add("input", locationA)
+            .build();
+
+        Vehicle vehicle = spy(createVehicle(2, 10, vehicleManager, vehicleManager.getOccupiedRestaurant(restaurantE)));
+        setOccupiedOfVehicle(vehicle, vehicleManager.getOccupied(nodeD));
+        addVehicleToVehicleManager(vehicleManager, vehicle, vehicleManager.getOccupied(nodeD));
+
+        BiConsumer<Vehicle, Long> arrivalAction = (v, t) -> {
+        };
+
+        getMoveQueueOfVehicle(vehicle).clear();
+        getMoveQueueOfVehicle(vehicle).push(createPath(new LinkedList<>(List.of(restaurantE, nodeD)), (v, t) -> {
+        }));
+
+        Method addVehicle = VehicleManager.Occupied.class.getDeclaredMethod("addVehicle", Class.forName("projekt.delivery.routing.VehicleImpl"), long.class);
+        addVehicle.setAccessible(true);
+        addVehicle.invoke(vehicleManager.getOccupied(edgeDE), vehicle, 0);
+
+        doNothing().when(vehicle).moveQueued(nodeCaptor.capture(), arrivalActionCaptor.capture());
+
+        vehicle.moveDirect(nodeA, arrivalAction);
+
+        verify(vehicle, times(1)).moveQueued(any(), any());
+
+        assertEquals(1, getMoveQueueOfVehicle(vehicle).size(), context,
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not add a the path to the next node to the move queue or added to many when the vehicle is on an edge");
+
+        Deque<Region.Node> nodes = getMoveQueueOfVehicle(vehicle).pop().nodes();
+
+        assertEquals(1, nodes.size(), context,
+            TR -> "The first path added to the move queue does not contain the correct number of nodes when the vehicle is on an edge");
+
+        assertEquals(restaurantE, nodes.pop(), context,
+            TR -> "The first path added to the move queue does not contain the node the vehicle previously moved to when the vehicle is on an edge");
+
+        assertEquals(nodeA, nodeCaptor.getValue(), context,
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct node to the moveQueued method");
+
+        assertEquals(arrivalAction, arrivalActionCaptor.getValue(), context,
+            TR -> "Vehicle.moveDirect(Node, BiConsumer<Vehicle, Long>) did not pass the correct arrival action to the moveQueued method");
     }
 
 }
