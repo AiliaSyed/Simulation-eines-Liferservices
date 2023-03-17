@@ -4,6 +4,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import projekt.ComparableUnitTests;
 import projekt.ObjectUnitTests;
+import projekt.base.Location;
+
+import javax.naming.spi.ObjectFactory;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
 
 import static org.tudalgo.algoutils.student.Student.crash;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,51 +30,88 @@ public class NodeImplUnitTests {
 
     @BeforeAll
     public static void initialize() {
-        crash(); // TODO: H12.4 - remove if implemented
+        crash();
+        // TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testEquals() {
-        crash(); // TODO: H12.4 - remove if implemented
+        objectUnitTests.testEquals();
+        // TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testHashCode() {
-        crash(); // TODO: H12.4 - remove if implemented
+        objectUnitTests.testHashCode();// TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testToString() {
-        crash(); // TODO: H12.4 - remove if implemented
+        objectUnitTests.testToString();
+        // TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testBiggerThen() {
-        crash(); // TODO: H12.4 - remove if implemented
+        comparableUnitTests.testBiggerThen();// TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testAsBigAs() {
-        crash(); // TODO: H12.4 - remove if implemented
+        comparableUnitTests.testAsBigAs();// TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testLessThen() {
-        crash(); // TODO: H12.4 - remove if implemented
+        comparableUnitTests.testLessThen();// TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testGetEdge() {
-        crash(); // TODO: H12.4 - remove if implemented
+        comparableUnitTests.testLessThen(); // TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testAdjacentNodes() {
-        crash(); // TODO: H12.4 - remove if implemented
+        Set<NodeImpl> adjacentNodesA = new HashSet<>();
+        adjacentNodesA.add(nodeB);
+        adjacentNodesA.add(nodeC);
+        assertEquals(adjacentNodesA, nodeA.getAdjacentNodes());
+
+        Set<NodeImpl> adjacentNodesB = new HashSet<>();
+        adjacentNodesB.add(nodeA);
+        adjacentNodesB.add(nodeC);
+        assertEquals(adjacentNodesB, nodeB.getAdjacentNodes());
+
+        Set<NodeImpl> adjacentNodesC = new HashSet<>();
+        adjacentNodesC.add(nodeA);
+        adjacentNodesC.add(nodeB);
+        assertEquals(adjacentNodesC, nodeC.getAdjacentNodes());
+
+        Set<NodeImpl> adjacentNodesD = new HashSet<>();
+        assertEquals(adjacentNodesD, nodeD.getAdjacentNodes());
+        // TODO: H12.4 - remove if implemented
     }
 
     @Test
     public void testAdjacentEdges() {
-        crash(); // TODO: H12.4 - remove if implemented
+        Set<NodeImpl> adjacentEdgesA = new HashSet<>();
+        adjacentEdgesA.add(nodeB);
+        adjacentEdgesA.add(nodeC);
+        assertEquals(adjacentEdgesA, nodeA.getAdjacentEdges());
+
+        Set<NodeImpl> adjacentEdgesB = new HashSet<>();
+        adjacentEdgesB.add(nodeA);
+        adjacentEdgesB.add(nodeC);
+        assertEquals(adjacentEdgesB, nodeB.getAdjacentEdges());
+
+        Set<NodeImpl> adjacentEdgesC = new HashSet<>();
+        adjacentEdgesC.add(nodeA);
+        adjacentEdgesC.add(nodeB);
+        assertEquals(adjacentEdgesC, nodeC.getAdjacentEdges());
+
+        Set<NodeImpl> adjacentEdgesD = new HashSet<>();
+        assertEquals(adjacentEdgesD, nodeD.getAdjacentEdges());
+        // TODO: H12.4 - remove if implemented
     }
 }

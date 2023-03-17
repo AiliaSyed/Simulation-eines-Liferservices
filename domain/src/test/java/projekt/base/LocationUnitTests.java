@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import projekt.ComparableUnitTests;
 import projekt.ObjectUnitTests;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 import static org.tudalgo.algoutils.student.Student.crash;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,37 +18,52 @@ public class LocationUnitTests {
 
     @BeforeAll
     public static void initialize() {
-        crash(); // TODO: H12.2 - remove if implemented
-    }
+        // Initialize testObjectFactory with a lambda that creates Location objects
+        Function<Integer, Location> testObjectFactory = i -> new Location(i, i + 1);
+        // Initialize objectUnitTests and comparableUnitTests with testObjectFactory and a toString function
+        objectUnitTests = new ObjectUnitTests<>(testObjectFactory, Location::toString);
+        comparableUnitTests = new ComparableUnitTests<>(testObjectFactory);
 
+        // Initialize objectUnitTests and comparableUnitTests with 10 test objects
+        objectUnitTests.initialize(10);
+        comparableUnitTests.initialize(10);
+
+        // TODO: H12.2 - remove if implemented
+    }
     @Test
     public void testEquals() {
-        crash(); // TODO: H12.2 - remove if implemented
+        objectUnitTests.testEquals();
+        // TODO: H12.2 - remove if implemented
     }
 
     @Test
     public void testHashCode() {
-        crash(); // TODO: H12.2 - remove if implemented
+        objectUnitTests.testHashCode();
+        // TODO: H12.2 - remove if implemented
     }
 
     @Test
     public void testToString() {
-        crash(); // TODO: H12.2 - remove if implemented
+        objectUnitTests.testToString();
+        // TODO: H12.2 - remove if implemented
     }
 
     @Test
     public void testBiggerThen() {
-        crash(); // TODO: H12.2 - remove if implemented
+        comparableUnitTests.testBiggerThen();
+        // TODO: H12.2 - remove if implemented
     }
 
     @Test
     public void testAsBigAs() {
-        crash(); // TODO: H12.2 - remove if implemented
+        comparableUnitTests.testAsBigAs();
+        // TODO: H12.2 - remove if implemented
     }
 
     @Test
     public void testLessThen() {
-        crash(); // TODO: H12.2 - remove if implemented
+        comparableUnitTests.testLessThen();
+        // TODO: H12.2 - remove if implemented
     }
 
 }
