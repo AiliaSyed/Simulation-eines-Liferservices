@@ -18,19 +18,42 @@ public class ComparableUnitTests<T extends Comparable<? super T>> {
 
     @SuppressWarnings("unchecked")
     public void initialize(int testObjectCount) {
-        crash(); // TODO: H12.1 - remove if implemented
+        testObjects = (T[]) new Comparable<?>[testObjectCount];
+
+        for (int i = 0; i < testObjectCount; i++) {
+            testObjects[i] = testObjectFactory.apply(i);
+        }
+        // TODO: H12.1 - remove if implemented
     }
 
     public void testBiggerThen() {
-        crash(); // TODO: H12.1 - remove if implemented
+        for (int i = 0; i < testObjects.length; i++) {
+            for (int j = i + 1; j < testObjects.length; j++) {
+                T obj1 = testObjects[i];
+                T obj2 = testObjects[j];
+                assert (obj1.compareTo(obj2) > 0);
+            }
+        }
+        // TODO: H12.1 - remove if implemented
     }
 
     @SuppressWarnings("EqualsWithItself")
     public void testAsBigAs() {
-        crash(); // TODO: H12.1 - remove if implemented
+        for (int i = 0; i < testObjects.length; i++) {
+            T obj = testObjects[i];
+            assert (obj.compareTo(obj) == 0);
+        }
+        // TODO: H12.1 - remove if implemented
     }
 
     public void testLessThen() {
-        crash(); // TODO: H12.1 - remove if implemented
+        for (int i = 0; i < testObjects.length; i++) {
+            for (int j = i + 1; j < testObjects.length; j++) {
+                T obj1 = testObjects[i];
+                T obj2 = testObjects[j];
+                assert (obj1.compareTo(obj2) < 0);
+            }
+        }
+        // TODO: H12.1 - remove if implemented
     }
 }

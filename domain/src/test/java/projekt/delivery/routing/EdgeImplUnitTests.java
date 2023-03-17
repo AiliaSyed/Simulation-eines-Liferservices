@@ -2,6 +2,7 @@ package projekt.delivery.routing;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
 import projekt.ComparableUnitTests;
 import projekt.ObjectUnitTests;
 
@@ -22,41 +23,44 @@ public class EdgeImplUnitTests {
 
     @BeforeAll
     public static void initialize() {
-        crash(); // TODO: H12.5 - remove if implemented
+        crash();
+        // TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testEquals() {
-        crash(); // TODO: H12.5 - remove if implemented
+        objectUnitTests.testEquals(); // TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testHashCode() {
-        crash(); // TODO: H12.5 - remove if implemented
+        objectUnitTests.testHashCode(); // TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testToString() {
-        crash(); // TODO: H12.5 - remove if implemented
+        objectUnitTests.testToString(); // TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testBiggerThen() {
-        crash(); // TODO: H12.5 - remove if implemented
+        comparableUnitTests.testBiggerThen();// TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testAsBigAs() {
-        crash(); // TODO: H12.5 - remove if implemented
+        comparableUnitTests.testAsBigAs();// TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testLessThen() {
-        crash(); // TODO: H12.5 - remove if implemented
+        comparableUnitTests.testLessThen();
+        // TODO: H12.5 - remove if implemented
     }
 
     @Test
     public void testGetNode() {
-        crash(); // TODO: H12.5 - remove if implemented
+        crash();
+    // TODO: H12.5 - remove if implemented
     }
 }
