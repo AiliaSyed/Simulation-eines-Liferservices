@@ -31,6 +31,7 @@ class VehicleManagerImpl implements VehicleManager {
     }
 
     /**
+     * It creates a map with all nodes and their occupied nodes
      * @User Ailia Syed
      * @param nodes
      * @return
@@ -55,9 +56,10 @@ class VehicleManagerImpl implements VehicleManager {
     } //TODO H6.1 - remove if implemented
 
     /**
+     * It creates a map with all edges and their occupied edges
      * @User Ailia Syed
      * @param edges
-     * @return
+     * @return unmodifiable map with all edges and their occupied edges
      */
     private Map<Region.Edge, OccupiedEdgeImpl> toOccupiedEdges(Collection<Region.Edge> edges) {
         Map<Region.Edge, OccupiedEdgeImpl> occupiedEdges = new HashMap<>();
@@ -69,6 +71,7 @@ class VehicleManagerImpl implements VehicleManager {
     } //TODO H6.1 - remove if implemented
 
     /**
+     *
      * @User Ailia Syed
      * @return unmodified set with all attributes of occupiedNodes und occupiedEdges
      */

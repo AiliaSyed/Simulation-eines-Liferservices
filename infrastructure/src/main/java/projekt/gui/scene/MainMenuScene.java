@@ -1,12 +1,11 @@
 package projekt.gui.scene;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -38,7 +37,19 @@ public class MainMenuScene extends MenuScene<MainMenuSceneController> {
     }
 
     @Override
-    public void initComponents() {
+    public void initComponents() { // create table view for problems
+        TableView<ProblemArchetype> problemTable = new TableView<>();
+        problemTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        problemTable.setItems(FXCollections.observableArrayList((ProblemArchetype) super.getProperties()));
+        TableColumn<ProblemArchetype, String> problemNameColumn = new TableColumn<>("Problem Name");
+        problemNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        problemTable.getColumns().add(problemNameColumn);
+        problemTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        });
+        // add table view to scene
+        VBox vbox = new VBox(problemTable);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(20));
         root.setCenter(createOptionsVBox());
     }
 

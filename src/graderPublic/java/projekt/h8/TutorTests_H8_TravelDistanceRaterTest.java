@@ -1,4 +1,4 @@
-package projekt.h7.h8;
+package projekt.h8;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

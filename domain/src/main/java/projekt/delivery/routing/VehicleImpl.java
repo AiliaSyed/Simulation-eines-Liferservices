@@ -55,6 +55,12 @@ class VehicleImpl implements Vehicle {
         }
         return startingNode.getComponent();
     }
+
+    /**
+     * This method returns the next node that the vehicle will move to
+     * @User Ailia Syed
+     * @return the next connected node of the current node
+     */
     private Region.Node getNextNode() {
         Region.Node currentNode = getCurrentNode();
         Set<Region.Node> connectedNodes = currentNode.getAdjacentNodes();
@@ -66,6 +72,13 @@ class VehicleImpl implements Vehicle {
         // If no next node is found, return null
         return null;
     }
+
+    /**
+     *
+     * @User Ailia Syed
+     * @param node
+     * @param arrivalAction
+     */
     @Override
     public void moveDirect(Region.Node node, BiConsumer<? super Vehicle, Long> arrivalAction) {
         if (node.equals(this.getCurrentNode())) {
@@ -85,8 +98,8 @@ class VehicleImpl implements Vehicle {
     //TODO H5.4 - remove if implemented
 
     /**
-     * @User Ailia Syed
      * moves the queue to the next destination for the vehicle
+     * @User Ailia Syed
      * @param node
      * @param arrivalAction
      */

@@ -10,9 +10,9 @@ import projekt.h4.TutorTests_H4_EdgeImplTest;
 import projekt.h5.TutorTests_H5_VehicleTest;
 import projekt.h6.TutorTests_H6_VehicleManager;
 import projekt.h7.TutorTests_H7_OrderGeneratorTest;
-import projekt.h7.h8.TutorTests_H8_AmountDeliveredRaterTest;
-import projekt.h7.h8.TutorTests_H8_InTimeRaterTest;
-import projekt.h7.h8.TutorTests_H8_TravelDistanceRaterTest;
+import projekt.h8.TutorTests_H8_AmountDeliveredRaterTest;
+import projekt.h8.TutorTests_H8_InTimeRaterTest;
+import projekt.h8.TutorTests_H8_TravelDistanceRaterTest;
 import projekt.h9.TutorTests_H9_BasicDeliveryServiceTest;
 
 import java.lang.reflect.Method;
