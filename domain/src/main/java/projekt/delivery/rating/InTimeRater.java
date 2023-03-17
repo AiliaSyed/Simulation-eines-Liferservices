@@ -37,11 +37,6 @@ public class InTimeRater implements Rater {
         this.maxTicksOff = maxTicksOff;
     }
 
-    /**
-     * This Method calculates the score of the Ticks
-     * This Method calculates the rating based on
-     * @return score of the Ticks
-     */
     @Override
     public double getScore() {
         if (maxTotalTicksOff == 0) {
@@ -55,11 +50,6 @@ public class InTimeRater implements Rater {
         // TODO: H8.2 - remove if implemented
     }
 
-    /**
-     *
-     * @param events All {@link Event}s that occurred during the tick.
-     * @param tick The executed tick.
-     */
     @Override
     public void onTick(List<Event> events, long tick) {
         for (Event event : events) {
