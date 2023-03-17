@@ -78,16 +78,34 @@ class EdgeImpl implements Region.Edge {
     }
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *
+     * returns node from locationA
+     * @return node from location A
+     */
     public Region.Node getNodeA() {
-        return region.getNode(locationA);// TODO: H4.1 - remove if implemented
+        return region.getNode(locationA);
     }
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *
+     * returns node from locationA
+     * @return node from location A
+     */
     public Region.Node getNodeB() {
-        return region.getNode(locationB); // TODO: H4.1 - remove if implemented
+        return region.getNode(locationB);
     }
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *
+     * compares object to given parameter
+     * returns
+     */
     public int compareTo(Region.@NotNull Edge o) {
         Comparator<Region.Edge> byNodeA = Comparator.comparing((Region.Edge e) -> e.getNodeA(), Comparator.nullsFirst(Comparator.naturalOrder()));
         Comparator<Region.Edge> byNodeB = Comparator.comparing((Region.Edge e) -> e.getNodeB(), Comparator.nullsFirst(Comparator.naturalOrder()));
@@ -96,9 +114,15 @@ class EdgeImpl implements Region.Edge {
 
     }
 
-        // TODO: H4.2 - remove if implemented
+
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *checks if the object is equal to the parameter
+     * @return true if object is equal to parameter
+     *         false if they are not equal
+     */
     public boolean equals(Object o) {
         if(o == null || !(o instanceof EdgeImpl))
             return false;
@@ -108,16 +132,27 @@ class EdgeImpl implements Region.Edge {
             && Objects.equals(this.locationA, ((EdgeImpl) o).locationA)
         && Objects.equals(this.locationB, ((EdgeImpl) o).locationB)
         && Objects.equals(this.duration, ((EdgeImpl) o).duration));
-        // TODO: H4.3 - remove if implemented
+
     }
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *
+     * hashes name, locationA, locationB, duration
+     * @return hash of name, locationA, locationB, duration
+     */
     public int hashCode() {
-        return Objects.hash(name,locationA,locationB,duration); // TODO: H4.4 - remove if implemented
+        return Objects.hash(name,locationA,locationB,duration);
     }
 
     @Override
+    /**
+     * @User Kristina Shigabutdinova
+     *
+     * returns a String containing name, locationA, locationB, duration of edge
+     */
     public String toString() {
-        return "EdgeImpl(name='"+name+"', locationA='"+locationA+"', locationB='"+locationB+"', duration='"+duration+"')" ;// TODO: H4.5 - remove if implemented
+        return "EdgeImpl(name='"+name+"', locationA='"+locationA+"', locationB='"+locationB+"', duration='"+duration+"')" ;
     }
 }
