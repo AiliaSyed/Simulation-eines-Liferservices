@@ -37,7 +37,9 @@ class RegionImpl implements Region {
      */
     @Override
     public @Nullable Node getNode(Location location) {
-        return nodes.get(location);//TODO H2.1 - remove if implemented
+        return nodes.get(location);
+
+        //TODO H2.1 - remove if implemented
     }
 
     /**
@@ -48,7 +50,10 @@ class RegionImpl implements Region {
      */
     @Override
     public @Nullable Edge getEdge(Location locationA, Location locationB) {
-        NodeImpl nodeA = nodes.get(locationA);
+        Map<Location,EdgeImpl> tmpEdge = locationA.compareTo(locationB) <= 0? edges.get(locationA):edges.get(locationB);
+        return tmpEdge == null? null : (locationA.compareTo(locationB)) <= 0? tmpEdge.get(locationB):tmpEdge.get(locationA);
+
+        /*NodeImpl nodeA = nodes.get(locationA);
         NodeImpl nodeB = nodes.get(locationB);
         if (nodeA == null || nodeB == null) {
             return null;
@@ -68,7 +73,12 @@ class RegionImpl implements Region {
             // Check if edge exists in reverse order
             edge = edges.get(nodeB).get(nodeA);
         }
-        return edge; //TODO: H2.3 - remove if implemented
+        return edge;
+         */
+
+        //TODO: H2.3 - remove if implemented
+
+
     }
     private @Nullable EdgeImpl getExistingEdge(Location locationA, Location locationB) {
         Map<Location, EdgeImpl> edgesFromLocationA = edges.get(locationA);
@@ -134,7 +144,21 @@ class RegionImpl implements Region {
          * if edge.getNodeA or edge.getNodeB is null then IllegalArgumentException with message "Node{A,B} " + location.toString() + " is not part of the region"
          * edges should be sorted. So using the constructor of EdgeImpl you need to check if
          * nodeA.getLocation().compareTo(nodeB.getLocation()) <= 0. If not, then swap the nodes.
-          */
+         */
+       if(!this.equals(edge.getRegion())){
+           throw new IllegalArgumentException("Edge " + edge.toString() + " has incorrect region");
+       }else if (edge.getNodeA() == null){
+           throw new IllegalArgumentException("NodeA " + edge.getLocationA().toString() + " is not part of the region");
+
+       } else if (edge.getNodeB() == null) {
+           throw new IllegalArgumentException("NodeB " + edge.getLocationB().toString() + " is not part of the region");
+       }else{
+           allEdges.add(edge);
+           Map<Location,EdgeImpl> insideLocation = Map.of(edge.getLocationA().compareTo(edge.getLocationB()) <= 0? edge.getLocationB() : edge.getLocationA(),edge);
+           edges.put(edge.getLocationA().compareTo(edge.getLocationB()) <= 0 ? edge.getLocationA() : edge.getLocationB(),insideLocation);
+       }
+
+           /*
             if(!edge.getRegion().equals(this)){
                 throw new IllegalArgumentException("Edge "+edge.toString()+" has incorrect region");
             }
@@ -153,6 +177,7 @@ class RegionImpl implements Region {
                 edges.computeIfAbsent(edge.getNodeB().getLocation(), k -> new HashMap<>()).put(edge.getNodeA().getLocation(), edge);
             }
             allEdges.add(edge);
+            */
 //TODO H2.4 - remove if implemented
     }
 
