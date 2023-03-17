@@ -26,6 +26,11 @@ public class AmountDeliveredRater implements Rater {
         this.factor = factor;
     }
 
+    /**
+     * This Method calculates the rating based on the number of deliveredOrders and totalOrders
+     *
+     * @return returns more than 0 if the proportion of orders shipped is sufficient, else returns 0
+     */
     @Override
     public double getScore() {
         double undeliveredOrders = totalOrders - deliveredOrders;
@@ -44,15 +49,14 @@ public class AmountDeliveredRater implements Rater {
         return RATING_CRITERIA;
     }
 
+    /**
+     * saves the number of totalOrders and undeliveredOrders
+     *
+     * @param events All {@link Event}s that occurred during the tick.
+     * @param tick The executed tick.
+     */
     @Override
     public void onTick(List<Event> events, long tick) {
-        /*if (events instanceof DeliverOrderEvent) {
-            // Bestellung wurde ausgeliefert
-            deliveredOrders ++;
-        } else if (events instanceof OrderReceivedEvent) {
-            // Bestellung wurde aufgenommen
-            totalOrders++;
-        }*/
         for(Event event : events) {
             if (event instanceof DeliverOrderEvent) {
                 deliveredOrders++;

@@ -68,7 +68,6 @@ public class TravelDistanceRater implements Rater {
                 worstDistance += distance;
             }
         }
-
         // update actualDistance with the distance of all vehicles
         for (Event event : events) {
             if (event instanceof ArrivedAtNodeEvent arrivedAtNodeEvent) {
